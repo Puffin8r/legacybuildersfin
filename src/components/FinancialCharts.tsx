@@ -56,6 +56,7 @@ export default function Charts({
                 strokeWidth={2.5}
                 dot={false}
                 name="Net Worth"
+                isAnimationActive={false}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -73,7 +74,7 @@ export default function Charts({
                 <XAxis dataKey="year" label={{ value: "Year", position: "insideBottom", offset: -5 }} />
                 <YAxis tickFormatter={currencyFormatter} width={90} />
                 <Tooltip formatter={(v: number) => formatCurrency(v)} labelFormatter={(l) => `Year ${l}`} />
-                <Bar dataKey="value" fill="hsl(168 50% 42%)" radius={[4, 4, 0, 0]} name="Value" />
+                <Bar dataKey="value" fill="hsl(168 50% 42%)" radius={[4, 4, 0, 0]} name="Value" isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -89,7 +90,7 @@ export default function Charts({
                 <XAxis type="number" tickFormatter={currencyFormatter} />
                 <YAxis dataKey="label" type="category" width={120} />
                 <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                <Bar dataKey="value" fill="hsl(42 90% 55%)" radius={[0, 4, 4, 0]} name="Income" />
+                <Bar dataKey="value" fill="hsl(42 90% 55%)" radius={[0, 4, 4, 0]} name="Income" isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>

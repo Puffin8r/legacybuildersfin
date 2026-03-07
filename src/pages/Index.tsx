@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import type { PersonalInputs, InvestmentAccount } from "@/lib/financial-calculations";
 import {
   calcIPN, calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency,
@@ -33,26 +33,29 @@ export default function Index() {
   const [inputs, setInputs] = useState<PersonalInputs>(defaultInputs);
   const [accounts, setAccounts] = useState<InvestmentAccount[]>(defaultAccounts);
 
-  const yearsToRetirement = Math.max(inputs.retirementAge - inputs.age, 1);
+  const deferredInputs = useDeferredValue(inputs);
+  const deferredAccounts = useDeferredValue(accounts);
 
-  const ipn = useMemo(() => calcIPN(inputs.monthlyIncome, inputs.yearsIncomeProtection), [inputs.monthlyIncome, inputs.yearsIncomeProtection]);
-  const fin = useMemo(() => calcFIN(inputs.monthlyIncome), [inputs.monthlyIncome]);
-  const ruleOf72 = useMemo(() => calcRuleOf72(inputs.expectedReturn), [inputs.expectedReturn]);
+  const yearsToRetirement = Math.max(deferredInputs.retirementAge - deferredInputs.age, 1);
+
+  const ipn = useMemo(() => calcIPN(deferredInputs.monthlyIncome, deferredInputs.yearsIncomeProtection), [deferredInputs.monthlyIncome, deferredInputs.yearsIncomeProtection]);
+  const fin = useMemo(() => calcFIN(deferredInputs.monthlyIncome), [deferredInputs.monthlyIncome]);
+  const ruleOf72 = useMemo(() => calcRuleOf72(deferredInputs.expectedReturn), [deferredInputs.expectedReturn]);
 
   const projectedNetWorth = useMemo(() => {
-    const mainProjection = calcFutureValue(inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement);
-    const accountsProjection = accounts.reduce((sum, a) => sum + calcFutureValue(a.balance, 0, a.interestRate, yearsToRetirement), 0);
+    const mainProjection = calcFutureValue(deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement);
+    const accountsProjection = deferredAccounts.reduce((sum, a) => sum + calcFutureValue(a.balance, 0, a.interestRate, yearsToRetirement), 0);
     return mainProjection + accountsProjection;
-  }, [inputs, accounts, yearsToRetirement]);
+  }, [deferredInputs, deferredAccounts, yearsToRetirement]);
 
   const monthlyRetirementIncome = projectedNetWorth * 0.04 / 12;
 
   const projectionData = useMemo(
-    () => calcProjectionData(inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement),
-    [inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement]
+    () => calcProjectionData(deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement),
+    [deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement]
   );
 
-  const totalCurrentNetWorth = inputs.currentSavings + accounts.reduce((s, a) => s + a.balance, 0);
+  const totalCurrentNetWorth = deferredInputs.currentSavings + deferredAccounts.reduce((s, a) => s + a.balance, 0);
   const progress = fin > 0 ? (totalCurrentNetWorth / fin) * 100 : 0;
 
   return (
@@ -72,7 +75,7 @@ export default function Index() {
           <div className="hidden sm:flex items-center gap-4 text-sm text-muted-foreground">
             <span>Rule of 72: <strong className="text-foreground">{ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`}</strong></span>
             <span className="text-border">|</span>
-            <span>Years to Retire: <strong className="text-foreground">{yearsToRetirement}</strong></span>
+            <span>Years to Retire: <strong className="text-foreground">{Math.max(inputs.retirementAge - inputs.age, 1)}</strong></span>
           </div>
         </div>
       </header>
