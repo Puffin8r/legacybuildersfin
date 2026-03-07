@@ -51,8 +51,8 @@ export default function Index() {
   const monthlyRetirementIncome = projectedNetWorth * 0.04 / 12;
 
   const projectionData = useMemo(
-    () => calcProjectionData(inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement),
-    [inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement]
+    () => calcProjectionData(deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement),
+    [deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement]
   );
 
   const totalCurrentNetWorth = inputs.currentSavings + accounts.reduce((s, a) => s + a.balance, 0);
