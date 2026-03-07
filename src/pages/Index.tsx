@@ -55,7 +55,7 @@ export default function Index() {
     [deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement]
   );
 
-  const totalCurrentNetWorth = inputs.currentSavings + accounts.reduce((s, a) => s + a.balance, 0);
+  const totalCurrentNetWorth = deferredInputs.currentSavings + deferredAccounts.reduce((s, a) => s + a.balance, 0);
   const progress = fin > 0 ? (totalCurrentNetWorth / fin) * 100 : 0;
 
   return (
