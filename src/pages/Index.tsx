@@ -43,10 +43,10 @@ export default function Index() {
   const ruleOf72 = useMemo(() => calcRuleOf72(deferredInputs.expectedReturn), [deferredInputs.expectedReturn]);
 
   const projectedNetWorth = useMemo(() => {
-    const mainProjection = calcFutureValue(inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement);
-    const accountsProjection = accounts.reduce((sum, a) => sum + calcFutureValue(a.balance, 0, a.interestRate, yearsToRetirement), 0);
+    const mainProjection = calcFutureValue(deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement);
+    const accountsProjection = deferredAccounts.reduce((sum, a) => sum + calcFutureValue(a.balance, 0, a.interestRate, yearsToRetirement), 0);
     return mainProjection + accountsProjection;
-  }, [inputs, accounts, yearsToRetirement]);
+  }, [deferredInputs, deferredAccounts, yearsToRetirement]);
 
   const monthlyRetirementIncome = projectedNetWorth * 0.04 / 12;
 
