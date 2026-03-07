@@ -75,7 +75,7 @@ export default function Index() {
           <div className="hidden sm:flex items-center gap-4 text-sm text-muted-foreground">
             <span>Rule of 72: <strong className="text-foreground">{ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`}</strong></span>
             <span className="text-border">|</span>
-            <span>Years to Retire: <strong className="text-foreground">{yearsToRetirement}</strong></span>
+            <span>Years to Retire: <strong className="text-foreground">{Math.max(inputs.retirementAge - inputs.age, 1)}</strong></span>
           </div>
         </div>
       </header>
