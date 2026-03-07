@@ -10,6 +10,13 @@ import InvestmentAccounts from "@/components/InvestmentAccounts";
 import FinancialCharts from "@/components/FinancialCharts";
 import RiskAnalysis from "@/components/RiskAnalysis";
 import FinancialSummary from "@/components/FinancialSummary";
+import AIFinancialAdvisor from "@/components/AIFinancialAdvisor";
+import LifetimeCompounding from "@/components/LifetimeCompounding";
+import DollarImpactVisualizer from "@/components/DollarImpactVisualizer";
+import StartNowVsLater from "@/components/StartNowVsLater";
+import WealthMountain from "@/components/WealthMountain";
+import FutureYouDisplay from "@/components/FutureYouDisplay";
+import ShareCard from "@/components/ShareCard";
 import { Landmark } from "lucide-react";
 
 const defaultInputs: PersonalInputs = {
@@ -58,6 +65,17 @@ export default function Index() {
   const totalCurrentNetWorth = deferredInputs.currentSavings + deferredAccounts.reduce((s, a) => s + a.balance, 0);
   const progress = fin > 0 ? (totalCurrentNetWorth / fin) * 100 : 0;
 
+  // Financial freedom age
+  const freedomAge = useMemo(() => {
+    const r = deferredInputs.expectedReturn / 100 / 12;
+    let balance = totalCurrentNetWorth;
+    for (let m = 0; m < 600; m++) {
+      if (balance >= fin) return deferredInputs.age + Math.floor(m / 12);
+      balance = balance * (1 + r) + deferredInputs.monthlyContributions;
+    }
+    return deferredInputs.age + 50;
+  }, [totalCurrentNetWorth, fin, deferredInputs]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -92,11 +110,28 @@ export default function Index() {
         {/* Progress */}
         <ProgressTracker currentNetWorth={totalCurrentNetWorth} fin={fin} />
 
+        {/* Future You */}
+        <FutureYouDisplay
+          projectedNetWorth={projectedNetWorth}
+          monthlyRetirementIncome={monthlyRetirementIncome}
+          retirementAge={inputs.retirementAge}
+          freedomAge={freedomAge}
+        />
+
         {/* Risk */}
         <RiskAnalysis
           projectedNetWorth={projectedNetWorth}
           fin={fin}
           monthlyContributions={inputs.monthlyContributions}
+        />
+
+        {/* AI Financial Advisor */}
+        <AIFinancialAdvisor
+          inputs={deferredInputs}
+          projectedNetWorth={projectedNetWorth}
+          fin={fin}
+          monthlyRetirementIncome={monthlyRetirementIncome}
+          totalCurrentNetWorth={totalCurrentNetWorth}
         />
 
         {/* Inputs + Accounts */}
@@ -109,6 +144,16 @@ export default function Index() {
           />
         </div>
 
+        {/* Wealth Mountain */}
+        <WealthMountain
+          age={deferredInputs.age}
+          retirementAge={deferredInputs.retirementAge}
+          currentSavings={deferredInputs.currentSavings}
+          monthlyContributions={deferredInputs.monthlyContributions}
+          expectedReturn={deferredInputs.expectedReturn}
+          fin={fin}
+        />
+
         {/* Charts */}
         <FinancialCharts
           projectionData={projectionData}
@@ -116,6 +161,36 @@ export default function Index() {
           expectedReturn={inputs.expectedReturn}
           yearsToRetirement={yearsToRetirement}
           projectedNetWorth={projectedNetWorth}
+        />
+
+        {/* Compounding Visualizations */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          <LifetimeCompounding
+            age={deferredInputs.age}
+            retirementAge={deferredInputs.retirementAge}
+            expectedReturn={deferredInputs.expectedReturn}
+          />
+          <DollarImpactVisualizer
+            expectedReturn={deferredInputs.expectedReturn}
+            yearsToRetirement={yearsToRetirement}
+            currentSavings={deferredInputs.currentSavings}
+          />
+        </div>
+
+        {/* Start Now vs Later */}
+        <StartNowVsLater
+          monthlyContribution={deferredInputs.monthlyContributions}
+          expectedReturn={deferredInputs.expectedReturn}
+          age={deferredInputs.age}
+          retirementAge={deferredInputs.retirementAge}
+        />
+
+        {/* Share Card */}
+        <ShareCard
+          projectedNetWorth={projectedNetWorth}
+          monthlyRetirementIncome={monthlyRetirementIncome}
+          freedomAge={freedomAge}
+          retirementAge={inputs.retirementAge}
         />
 
         {/* Summary */}
