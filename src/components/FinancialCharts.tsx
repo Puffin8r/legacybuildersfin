@@ -74,7 +74,7 @@ export default function Charts({
                 <XAxis dataKey="year" label={{ value: "Year", position: "insideBottom", offset: -5 }} />
                 <YAxis tickFormatter={currencyFormatter} width={90} />
                 <Tooltip formatter={(v: number) => formatCurrency(v)} labelFormatter={(l) => `Year ${l}`} />
-                <Bar dataKey="value" fill="hsl(168 50% 42%)" radius={[4, 4, 0, 0]} name="Value" />
+                <Bar dataKey="value" fill="hsl(168 50% 42%)" radius={[4, 4, 0, 0]} name="Value" isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
