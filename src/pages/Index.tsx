@@ -33,7 +33,10 @@ export default function Index() {
   const [inputs, setInputs] = useState<PersonalInputs>(defaultInputs);
   const [accounts, setAccounts] = useState<InvestmentAccount[]>(defaultAccounts);
 
-  const yearsToRetirement = Math.max(inputs.retirementAge - inputs.age, 1);
+  const deferredInputs = useDeferredValue(inputs);
+  const deferredAccounts = useDeferredValue(accounts);
+
+  const yearsToRetirement = Math.max(deferredInputs.retirementAge - deferredInputs.age, 1);
 
   const ipn = useMemo(() => calcIPN(inputs.monthlyIncome, inputs.yearsIncomeProtection), [inputs.monthlyIncome, inputs.yearsIncomeProtection]);
   const fin = useMemo(() => calcFIN(inputs.monthlyIncome), [inputs.monthlyIncome]);
