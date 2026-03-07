@@ -90,7 +90,7 @@ export default function Charts({
                 <XAxis type="number" tickFormatter={currencyFormatter} />
                 <YAxis dataKey="label" type="category" width={120} />
                 <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                <Bar dataKey="value" fill="hsl(42 90% 55%)" radius={[0, 4, 4, 0]} name="Income" />
+                <Bar dataKey="value" fill="hsl(42 90% 55%)" radius={[0, 4, 4, 0]} name="Income" isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
