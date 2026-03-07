@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import type { PersonalInputs, InvestmentAccount } from "@/lib/financial-calculations";
 import {
   calcIPN, calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency,
