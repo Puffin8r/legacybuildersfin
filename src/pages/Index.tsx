@@ -38,9 +38,9 @@ export default function Index() {
 
   const yearsToRetirement = Math.max(deferredInputs.retirementAge - deferredInputs.age, 1);
 
-  const ipn = useMemo(() => calcIPN(inputs.monthlyIncome, inputs.yearsIncomeProtection), [inputs.monthlyIncome, inputs.yearsIncomeProtection]);
-  const fin = useMemo(() => calcFIN(inputs.monthlyIncome), [inputs.monthlyIncome]);
-  const ruleOf72 = useMemo(() => calcRuleOf72(inputs.expectedReturn), [inputs.expectedReturn]);
+  const ipn = useMemo(() => calcIPN(deferredInputs.monthlyIncome, deferredInputs.yearsIncomeProtection), [deferredInputs.monthlyIncome, deferredInputs.yearsIncomeProtection]);
+  const fin = useMemo(() => calcFIN(deferredInputs.monthlyIncome), [deferredInputs.monthlyIncome]);
+  const ruleOf72 = useMemo(() => calcRuleOf72(deferredInputs.expectedReturn), [deferredInputs.expectedReturn]);
 
   const projectedNetWorth = useMemo(() => {
     const mainProjection = calcFutureValue(inputs.currentSavings, inputs.monthlyContributions, inputs.expectedReturn, yearsToRetirement);
