@@ -56,6 +56,7 @@ export default function Charts({
                 strokeWidth={2.5}
                 dot={false}
                 name="Net Worth"
+                isAnimationActive={false}
               />
             </LineChart>
           </ResponsiveContainer>
