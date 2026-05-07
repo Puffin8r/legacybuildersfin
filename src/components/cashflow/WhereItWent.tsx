@@ -63,6 +63,19 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
 
   const insights = useMemo(() => whereInsights(cf.expenses), [cf.expenses]);
 
+  // Fire leak.detected webhook when the leak signature changes
+  const lastLeakSig = useRef<string | null>(null);
+  useEffect(() => {
+    if (!leaks.length) return;
+    const sig = leaks.map(l => `${l.title}:${l.amount.toFixed(2)}`).join("|");
+    if (lastLeakSig.current === sig) return;
+    lastLeakSig.current = sig;
+    void fireEvent("leak.detected", {
+      total_leak_amount: leaks.reduce((s, l) => s + l.amount, 0),
+      leaks: leaks.map(l => ({ title: l.title, amount: l.amount, why: l.why, action: l.action })),
+    });
+  }, [leaks]);
+
   return (
     <div className="space-y-4">
       {/* HEADER CARD */}
