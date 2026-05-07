@@ -68,6 +68,8 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
         </CardContent>
       </Card>
 
+      <InsightList insights={insights} />
+
       {/* SAFE TO SPEND */}
       <SafeToSpendCard safe={safe} />
 
