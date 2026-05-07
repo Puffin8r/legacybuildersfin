@@ -8,7 +8,7 @@ export interface Account {
   created_at?: string;
 }
 
-export type IncomeFrequency = "weekly" | "biweekly" | "monthly" | "one-time";
+export type IncomeFrequency = "once" | "weekly" | "biweekly" | "monthly" | "one-time";
 
 export interface IncomeSource {
   id: string;
@@ -19,7 +19,7 @@ export interface IncomeSource {
   created_at?: string;
 }
 
-export type BillFrequency = "monthly" | "weekly" | "biweekly" | "yearly" | "one-time";
+export type BillFrequency = "once" | "monthly" | "weekly" | "biweekly" | "yearly" | "one-time";
 
 export interface Bill {
   id: string;
