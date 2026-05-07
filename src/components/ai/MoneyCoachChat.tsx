@@ -45,6 +45,54 @@ const SUGGESTED: Record<CoachTab, string[]> = {
   ],
 };
 
+// Follow-up question pool per tab. Keywords trigger context-aware replies
+// based on what the assistant just said.
+type FollowUp = { q: string; match?: RegExp };
+const FOLLOWUPS: Record<CoachTab, FollowUp[]> = {
+  today: [
+    { q: "How can I avoid that overdraft?", match: /overdraft|negative|run out|short/i },
+    { q: "What bills should I delay?", match: /bill|due|pay/i },
+    { q: "How much can I safely spend today?", match: /safe|spend|cash|balance/i },
+    { q: "When does my next paycheck land?", match: /paycheck|income|deposit/i },
+    { q: "Show me my next 7 days", match: /week|days|upcoming|timeline/i },
+    { q: "What's a quick way to boost my buffer?" },
+  ],
+  where: [
+    { q: "How do I cut that category by 25%?", match: /category|food|dining|shopping|coffee|subscription/i },
+    { q: "Which subscriptions should I cancel?", match: /subscription|recurring|netflix|spotify/i },
+    { q: "Are there any duplicate charges?", match: /duplicate|charge|fee/i },
+    { q: "What's a realistic spending cap?", match: /cap|budget|limit|cut/i },
+    { q: "Compare this month to last month" },
+    { q: "What's my single biggest leak?" },
+  ],
+  fix: [
+    { q: "How fast can I be debt-free?", match: /debt|payoff|free|months|years/i },
+    { q: "Should I do snowball or avalanche?", match: /snowball|avalanche|method|order/i },
+    { q: "How much extra should I throw at it?", match: /extra|payment|minimum|pay more/i },
+    { q: "How big should my emergency fund be?", match: /emergency|fund|buffer|cushion/i },
+    { q: "What if I add $50/mo to savings?", match: /save|saving|goal|fund/i },
+    { q: "What's the smallest win I can grab this week?" },
+  ],
+  future: [
+    { q: "What if I retire 5 years earlier?", match: /retire|age|years|early/i },
+    { q: "How much more do I need monthly?", match: /contribut|monthly|save|invest/i },
+    { q: "What return rate am I assuming?", match: /return|rate|growth|compound/i },
+    { q: "How does inflation change this?", match: /inflation|real|today's dollars/i },
+    { q: "What's my FIN in plain English?", match: /fin|financial independence|number/i },
+    { q: "Show me a more aggressive plan" },
+  ],
+};
+
+function pickFollowUps(reply: string, tab: CoachTab, asked: Set<string>): string[] {
+  const pool = FOLLOWUPS[tab];
+  const matched = pool.filter(f => f.match && f.match.test(reply) && !asked.has(f.q));
+  const fallback = pool.filter(f => !asked.has(f.q));
+  const out: string[] = [];
+  for (const f of matched) { if (out.length < 3) out.push(f.q); }
+  for (const f of fallback) { if (out.length < 3 && !out.includes(f.q)) out.push(f.q); }
+  return out;
+}
+
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
 export default function MoneyCoachChat({ cf, tab }: { cf: CashFlow; tab: CoachTab }) {
