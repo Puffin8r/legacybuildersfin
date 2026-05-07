@@ -33,17 +33,23 @@ export interface Bill {
 }
 
 export type ExpenseCategory =
+  | "Housing"
   | "Food"
-  | "Transport"
+  | "Gas"
+  | "Transportation"
+  | "Insurance"
+  | "Debt"
   | "Subscriptions"
-  | "Shopping"
   | "Entertainment"
-  | "Health"
+  | "Shopping"
+  | "Savings"
+  | "Fees"
   | "Other";
 
 export interface Expense {
   id: string;
-  description: string;
+  description: string;   // notes
+  merchant?: string;
   amount: number;
   category: ExpenseCategory;
   date: string;          // ISO date
@@ -51,12 +57,17 @@ export interface Expense {
 }
 
 export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
+  "Housing",
   "Food",
-  "Transport",
+  "Gas",
+  "Transportation",
+  "Insurance",
+  "Debt",
   "Subscriptions",
-  "Shopping",
   "Entertainment",
-  "Health",
+  "Shopping",
+  "Savings",
+  "Fees",
   "Other",
 ];
 
