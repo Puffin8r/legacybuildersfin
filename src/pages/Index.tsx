@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Wallet, PieChart, Sparkles, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon } from "lucide-react";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
