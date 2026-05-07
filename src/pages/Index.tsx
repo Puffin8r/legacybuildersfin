@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Wallet, PieChart, Sparkles, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon } from "lucide-react";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
@@ -35,10 +36,13 @@ export default function Index() {
         <div className="px-4 py-4 max-w-2xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold">$</div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="text-base font-bold font-heading leading-tight">CashFlow Blueprint</h1>
               <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
             </div>
+            <Link to="/settings" aria-label="Settings" className="p-2 -mr-2 rounded-md hover:bg-accent text-muted-foreground">
+              <SettingsIcon className="h-5 w-5" />
+            </Link>
           </div>
         </div>
       </header>
