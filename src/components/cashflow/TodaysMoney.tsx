@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 } from "@/lib/cashflow-engine";
 import { todaysInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
 
 type Freq = "once" | "weekly" | "biweekly" | "monthly";
 
@@ -46,6 +47,20 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     () => todaysInsights({ totalCash, income: cf.income, bills: cf.bills, expenses: cf.expenses }),
     [totalCash, cf.income, cf.bills, cf.expenses],
   );
+
+  // Fire overdraft webhook once per unique (date,ending) signature
+  const lastOverdraftSig = useRef<string | null>(null);
+  useEffect(() => {
+    if (!overdraft) return;
+    const sig = `${overdraft.date}:${overdraft.ending.toFixed(2)}`;
+    if (lastOverdraftSig.current === sig) return;
+    lastOverdraftSig.current = sig;
+    void fireEvent("overdraft.warning", {
+      predicted_date: overdraft.date,
+      predicted_balance: overdraft.ending,
+      cash_on_hand: totalCash,
+    });
+  }, [overdraft, totalCash]);
 
   return (
     <div className="space-y-4">
@@ -211,7 +226,9 @@ function PaycheckPlanner({ cf }: { cf: CashFlow }) {
             <div className="flex gap-2">
               <Button className="flex-1" onClick={() => {
                 if (!name || !amount) return;
-                cf.addIncome({ name, amount: parseFloat(amount), frequency: freq, next_date: date });
+                const payload = { name, amount: parseFloat(amount), frequency: freq, next_date: date };
+                cf.addIncome(payload);
+                void fireEvent("transaction.added", { type: "income", ...payload });
                 setName(""); setAmount(""); setOpen(false);
               }}>Add paycheck</Button>
               <Button variant="outline" onClick={()=>setOpen(false)}>Cancel</Button>
@@ -276,7 +293,9 @@ function BillPlanner({ cf }: { cf: CashFlow }) {
             <div className="flex gap-2">
               <Button className="flex-1" onClick={() => {
                 if (!name || !amount) return;
-                cf.addBill({ name, amount: parseFloat(amount), due_date: date, frequency: freq, is_essential: essential });
+                const payload = { name, amount: parseFloat(amount), due_date: date, frequency: freq, is_essential: essential };
+                cf.addBill(payload);
+                void fireEvent("transaction.added", { type: "bill", ...payload });
                 setName(""); setAmount(""); setOpen(false);
               }}>Add bill</Button>
               <Button variant="outline" onClick={()=>setOpen(false)}>Cancel</Button>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useDeferredValue } from "react";
+import { useEffect, useState, useMemo, useDeferredValue, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurre
 import BookReviewDialog from "@/components/BookReviewDialog";
 import { futureInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
 
 interface SimpleInputs {
   currentAge: number;
@@ -55,6 +56,25 @@ export default function FutureBlueprint() {
     fin, currentInvestments: deferred.currentInvestments, projected,
     monthlyContribution: deferred.monthlyContribution, yearsToRetire,
   }), [fin, deferred.currentInvestments, projected, deferred.monthlyContribution, yearsToRetire]);
+
+  // Fire blueprint.completed once per stable input set (debounced)
+  const lastBlueprintSig = useRef<string | null>(null);
+  useEffect(() => {
+    const sig = JSON.stringify(deferred);
+    const t = setTimeout(() => {
+      if (lastBlueprintSig.current === sig) return;
+      lastBlueprintSig.current = sig;
+      void fireEvent("blueprint.completed", {
+        inputs: deferred,
+        fin,
+        projected_net_worth: projected,
+        monthly_retirement_income: monthlyRetirementIncome,
+        progress_pct: progress,
+        years_to_retire: yearsToRetire,
+      });
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [deferred, fin, projected, monthlyRetirementIncome, progress, yearsToRetire]);
 
   const set = <K extends keyof SimpleInputs>(k: K, v: number) => setInputs(p => ({ ...p, [k]: v }));
 

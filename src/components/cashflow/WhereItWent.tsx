@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { calcSafeToSpend } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { whereInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
 
 const COLORS = [
   "hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))",
@@ -61,6 +62,19 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
   const leaks = useMemo(() => detectLeaks(cf.expenses, cf.bills), [cf.expenses, cf.bills]);
 
   const insights = useMemo(() => whereInsights(cf.expenses), [cf.expenses]);
+
+  // Fire leak.detected webhook when the leak signature changes
+  const lastLeakSig = useRef<string | null>(null);
+  useEffect(() => {
+    if (!leaks.length) return;
+    const sig = leaks.map(l => `${l.title}:${l.amount.toFixed(2)}`).join("|");
+    if (lastLeakSig.current === sig) return;
+    lastLeakSig.current = sig;
+    void fireEvent("leak.detected", {
+      total_leak_amount: leaks.reduce((s, l) => s + l.amount, 0),
+      leaks: leaks.map(l => ({ title: l.title, amount: l.amount, why: l.why, action: l.action })),
+    });
+  }, [leaks]);
 
   return (
     <div className="space-y-4">
@@ -387,13 +401,15 @@ function TransactionEntry({ cf }: { cf: CashFlow }) {
       setError(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
     }
-    cf.addExpense({
+    const tx = {
       description: parsed.data.description ?? "",
       merchant: parsed.data.merchant,
       amount: parsed.data.amount,
       category: parsed.data.category,
       date: parsed.data.date,
-    });
+    };
+    cf.addExpense(tx);
+    void fireEvent("transaction.added", { ...tx, source: "manual_entry" });
     setAmount(""); setMerchant(""); setDescription("");
   };
 

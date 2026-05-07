@@ -18,6 +18,8 @@ import { calcSafeToSpend, billsThisMonth, spendingThisMonth, buildTimeline, firs
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { fixInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
+import { toast } from "sonner";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
   const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
@@ -487,6 +489,25 @@ function MonthlyReset({ cf }: { cf: CashFlow }) {
           <p className="mt-1 text-sm">{focus}</p>
         </CardContent>
       </Card>
+
+      <Button
+        className="w-full"
+        onClick={() => {
+          void fireEvent("monthly.reset", {
+            month: now.toLocaleDateString("en", { month: "long", year: "numeric" }),
+            total_income: totalIncome,
+            total_bills: totalBills,
+            total_spending: totalSpending,
+            total_saved: totalSaved,
+            net: net,
+            biggest_leak: biggestLeak ? { category: biggestLeak[0], amount: biggestLeak[1] } : null,
+            next_focus: focus,
+          });
+          toast.success("Monthly reset complete!");
+        }}
+      >
+        <CheckCircle2 className="h-4 w-4 mr-1"/>Mark month complete
+      </Button>
     </>
   );
 }
