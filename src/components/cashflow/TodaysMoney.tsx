@@ -226,7 +226,9 @@ function PaycheckPlanner({ cf }: { cf: CashFlow }) {
             <div className="flex gap-2">
               <Button className="flex-1" onClick={() => {
                 if (!name || !amount) return;
-                cf.addIncome({ name, amount: parseFloat(amount), frequency: freq, next_date: date });
+                const payload = { name, amount: parseFloat(amount), frequency: freq, next_date: date };
+                cf.addIncome(payload);
+                void fireEvent("transaction.added", { type: "income", ...payload });
                 setName(""); setAmount(""); setOpen(false);
               }}>Add paycheck</Button>
               <Button variant="outline" onClick={()=>setOpen(false)}>Cancel</Button>
