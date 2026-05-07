@@ -1,207 +1,78 @@
-import { useState, useMemo, useDeferredValue } from "react";
-import type { PersonalInputs, InvestmentAccount } from "@/lib/financial-calculations";
-import {
-  calcIPN, calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency,
-} from "@/lib/financial-calculations";
-import DashboardMetrics from "@/components/DashboardMetrics";
-import PersonalInputsPanel from "@/components/PersonalInputsPanel";
-import ProgressTracker from "@/components/ProgressTracker";
-import InvestmentAccounts from "@/components/InvestmentAccounts";
-import FinancialCharts from "@/components/FinancialCharts";
-import RiskAnalysis from "@/components/RiskAnalysis";
-import FinancialSummary from "@/components/FinancialSummary";
-import AIFinancialAdvisor from "@/components/AIFinancialAdvisor";
-import LifetimeCompounding from "@/components/LifetimeCompounding";
-import DollarImpactVisualizer from "@/components/DollarImpactVisualizer";
-import StartNowVsLater from "@/components/StartNowVsLater";
-import WealthMountain from "@/components/WealthMountain";
-import FutureYouDisplay from "@/components/FutureYouDisplay";
-import ShareCard from "@/components/ShareCard";
-import { Landmark } from "lucide-react";
+import { useState } from "react";
+import { Wallet, PieChart, Sparkles, TrendingUp } from "lucide-react";
+import { useCashFlow } from "@/hooks/useCashFlow";
+import TodaysMoney from "@/components/cashflow/TodaysMoney";
+import WhereItWent from "@/components/cashflow/WhereItWent";
+import FixMyMoney from "@/components/cashflow/FixMyMoney";
+import FutureBlueprint from "@/components/FutureBlueprint";
+import { cn } from "@/lib/utils";
 
-const defaultInputs: PersonalInputs = {
-  age: 30,
-  retirementAge: 65,
-  monthlyIncome: 5833,
-  currentSavings: 50000,
-  monthlyContributions: 1000,
-  expectedReturn: 8,
-  inflationRate: 3,
-  yearsIncomeProtection: 12,
-};
+type Tab = "today" | "where" | "fix" | "future";
 
-const defaultAccounts: InvestmentAccount[] = [
-  { id: "1", name: "401(k)", balance: 30000, interestRate: 8 },
-  { id: "2", name: "Roth IRA", balance: 15000, interestRate: 8 },
-  { id: "3", name: "Brokerage", balance: 5000, interestRate: 7 },
+const TABS: { id: Tab; label: string; icon: typeof Wallet }[] = [
+  { id: "today",  label: "Today",      icon: Wallet },
+  { id: "where",  label: "Where",      icon: PieChart },
+  { id: "fix",    label: "Fix",        icon: Sparkles },
+  { id: "future", label: "Future",     icon: TrendingUp },
 ];
 
+const TITLES: Record<Tab, { title: string; subtitle: string }> = {
+  today:  { title: "Today's Money",   subtitle: "What's in. What's out. Right now." },
+  where:  { title: "Where It Went",   subtitle: "See where your money disappeared." },
+  fix:    { title: "Fix My Money",    subtitle: "Simple steps to avoid overdrafts." },
+  future: { title: "Future Blueprint", subtitle: "Plan long-term wealth & retirement." },
+};
+
 export default function Index() {
-  const [inputs, setInputs] = useState<PersonalInputs>(defaultInputs);
-  const [accounts, setAccounts] = useState<InvestmentAccount[]>(defaultAccounts);
-
-  const deferredInputs = useDeferredValue(inputs);
-  const deferredAccounts = useDeferredValue(accounts);
-
-  const yearsToRetirement = Math.max(deferredInputs.retirementAge - deferredInputs.age, 1);
-
-  const ipn = useMemo(() => calcIPN(deferredInputs.monthlyIncome, deferredInputs.yearsIncomeProtection), [deferredInputs.monthlyIncome, deferredInputs.yearsIncomeProtection]);
-  const fin = useMemo(() => calcFIN(deferredInputs.monthlyIncome), [deferredInputs.monthlyIncome]);
-  const ruleOf72 = useMemo(() => calcRuleOf72(deferredInputs.expectedReturn), [deferredInputs.expectedReturn]);
-
-  const projectedNetWorth = useMemo(() => {
-    const mainProjection = calcFutureValue(deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement);
-    const accountsProjection = deferredAccounts.reduce((sum, a) => sum + calcFutureValue(a.balance, 0, a.interestRate, yearsToRetirement), 0);
-    return mainProjection + accountsProjection;
-  }, [deferredInputs, deferredAccounts, yearsToRetirement]);
-
-  const monthlyRetirementIncome = projectedNetWorth * 0.04 / 12;
-
-  const projectionData = useMemo(
-    () => calcProjectionData(deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement),
-    [deferredInputs.currentSavings, deferredInputs.monthlyContributions, deferredInputs.expectedReturn, yearsToRetirement]
-  );
-
-  const totalCurrentNetWorth = deferredInputs.currentSavings + deferredAccounts.reduce((s, a) => s + a.balance, 0);
-  const progress = fin > 0 ? (totalCurrentNetWorth / fin) * 100 : 0;
-
-  // Financial freedom age
-  const freedomAge = useMemo(() => {
-    const r = deferredInputs.expectedReturn / 100 / 12;
-    let balance = totalCurrentNetWorth;
-    for (let m = 0; m < 600; m++) {
-      if (balance >= fin) return deferredInputs.age + Math.floor(m / 12);
-      balance = balance * (1 + r) + deferredInputs.monthlyContributions;
-    }
-    return deferredInputs.age + 50;
-  }, [totalCurrentNetWorth, fin, deferredInputs]);
+  const [tab, setTab] = useState<Tab>("today");
+  const cf = useCashFlow();
+  const meta = TITLES[tab];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container flex items-center justify-between py-4">
+    <div className="min-h-screen bg-background pb-24">
+      <header className="sticky top-0 z-20 bg-card/90 backdrop-blur border-b">
+        <div className="px-4 py-4 max-w-2xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <Landmark className="h-5 w-5 text-primary-foreground" />
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold">$</div>
+            <div className="min-w-0">
+              <h1 className="text-base font-bold font-heading leading-tight">CashFlow Blueprint</h1>
+              <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
             </div>
-            <div>
-              <h1 className="text-xl font-bold font-heading">Financial Blueprint</h1>
-              <p className="text-xs text-muted-foreground">Visualize Your Path to Financial Independence</p>
-            </div>
-          </div>
-          <div className="hidden sm:flex items-center gap-4 text-sm text-muted-foreground">
-            <span>Rule of 72: <strong className="text-foreground">{ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`}</strong></span>
-            <span className="text-border">|</span>
-            <span>Years to Retire: <strong className="text-foreground">{Math.max(inputs.retirementAge - inputs.age, 1)}</strong></span>
           </div>
         </div>
       </header>
 
-      <main className="container py-8 space-y-8">
-        {/* Metrics */}
-        <DashboardMetrics
-          fin={fin}
-          ipn={ipn}
-          projectedNetWorth={projectedNetWorth}
-          monthlyRetirementIncome={monthlyRetirementIncome}
-        />
-
-        {/* Progress */}
-        <ProgressTracker currentNetWorth={totalCurrentNetWorth} fin={fin} />
-
-        {/* Future You */}
-        <FutureYouDisplay
-          projectedNetWorth={projectedNetWorth}
-          monthlyRetirementIncome={monthlyRetirementIncome}
-          retirementAge={inputs.retirementAge}
-          freedomAge={freedomAge}
-        />
-
-        {/* Risk */}
-        <RiskAnalysis
-          projectedNetWorth={projectedNetWorth}
-          fin={fin}
-          monthlyContributions={inputs.monthlyContributions}
-        />
-
-        {/* AI Financial Advisor */}
-        <AIFinancialAdvisor
-          inputs={deferredInputs}
-          projectedNetWorth={projectedNetWorth}
-          fin={fin}
-          monthlyRetirementIncome={monthlyRetirementIncome}
-          totalCurrentNetWorth={totalCurrentNetWorth}
-        />
-
-        {/* Inputs + Accounts */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          <PersonalInputsPanel inputs={inputs} onChange={setInputs} />
-          <InvestmentAccounts
-            accounts={accounts}
-            onChange={setAccounts}
-            yearsToRetirement={yearsToRetirement}
-          />
-        </div>
-
-        {/* Wealth Mountain */}
-        <WealthMountain
-          age={deferredInputs.age}
-          retirementAge={deferredInputs.retirementAge}
-          currentSavings={deferredInputs.currentSavings}
-          monthlyContributions={deferredInputs.monthlyContributions}
-          expectedReturn={deferredInputs.expectedReturn}
-          fin={fin}
-        />
-
-        {/* Charts */}
-        <FinancialCharts
-          projectionData={projectionData}
-          currentSavings={inputs.currentSavings}
-          expectedReturn={inputs.expectedReturn}
-          yearsToRetirement={yearsToRetirement}
-          projectedNetWorth={projectedNetWorth}
-        />
-
-        {/* Compounding Visualizations */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          <LifetimeCompounding
-            age={deferredInputs.age}
-            retirementAge={deferredInputs.retirementAge}
-            expectedReturn={deferredInputs.expectedReturn}
-          />
-          <DollarImpactVisualizer
-            expectedReturn={deferredInputs.expectedReturn}
-            yearsToRetirement={yearsToRetirement}
-            currentSavings={deferredInputs.currentSavings}
-          />
-        </div>
-
-        {/* Start Now vs Later */}
-        <StartNowVsLater
-          monthlyContribution={deferredInputs.monthlyContributions}
-          expectedReturn={deferredInputs.expectedReturn}
-          age={deferredInputs.age}
-          retirementAge={deferredInputs.retirementAge}
-        />
-
-        {/* Share Card */}
-        <ShareCard
-          projectedNetWorth={projectedNetWorth}
-          monthlyRetirementIncome={monthlyRetirementIncome}
-          freedomAge={freedomAge}
-          retirementAge={inputs.retirementAge}
-        />
-
-        {/* Summary */}
-        <FinancialSummary
-          ipn={ipn}
-          fin={fin}
-          projectedNetWorth={projectedNetWorth}
-          monthlyRetirementIncome={monthlyRetirementIncome}
-          progress={progress}
-        />
+      <main className="px-4 py-5 max-w-2xl mx-auto">
+        <h2 className="section-title mb-4">{meta.title}</h2>
+        {tab === "today"  && <TodaysMoney cf={cf} />}
+        {tab === "where"  && <WhereItWent cf={cf} />}
+        {tab === "fix"    && <FixMyMoney cf={cf} />}
+        {tab === "future" && <FutureBlueprint />}
       </main>
+
+      {/* Bottom nav (mobile-first) */}
+      <nav className="fixed bottom-0 inset-x-0 z-30 border-t bg-card/95 backdrop-blur">
+        <div className="max-w-2xl mx-auto grid grid-cols-4">
+          {TABS.map(t => {
+            const Icon = t.icon;
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center py-2.5 gap-1 text-xs font-medium transition-colors",
+                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className={cn("h-5 w-5", active && "scale-110")} />
+                <span>{t.label}</span>
+                {active && <span className="absolute bottom-0 h-0.5 w-10 bg-primary rounded-full" />}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
