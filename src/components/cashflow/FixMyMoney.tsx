@@ -16,6 +16,8 @@ import {
 } from "@/lib/cashflow-types";
 import { calcSafeToSpend, billsThisMonth, spendingThisMonth, buildTimeline, firstOverdraft } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
+import { fixInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
   return (
