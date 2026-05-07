@@ -98,6 +98,16 @@ export default function FutureBlueprint() {
         </CardContent>
       </Card>
 
+      {/* Contribution needed to reach FIN */}
+      <ContributionToFin
+        currentInvestments={deferred.currentInvestments}
+        annualReturn={deferred.expectedReturn}
+        years={yearsToRetire}
+        fin={fin}
+        currentMonthly={deferred.monthlyContribution}
+        onApply={(v) => set("monthlyContribution", v)}
+      />
+
       {/* Single projection chart */}
       <Card>
         <CardHeader className="pb-2">
