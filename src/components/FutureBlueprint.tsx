@@ -1,4 +1,4 @@
-import { useState, useMemo, useDeferredValue } from "react";
+import { useEffect, useState, useMemo, useDeferredValue, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurre
 import BookReviewDialog from "@/components/BookReviewDialog";
 import { futureInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
 
 interface SimpleInputs {
   currentAge: number;
