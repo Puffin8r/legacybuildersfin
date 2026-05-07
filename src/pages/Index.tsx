@@ -5,6 +5,7 @@ import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
 import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
+import MoneyCoachChat from "@/components/ai/MoneyCoachChat";
 import { cn } from "@/lib/utils";
 
 type Tab = "today" | "where" | "fix" | "future";
