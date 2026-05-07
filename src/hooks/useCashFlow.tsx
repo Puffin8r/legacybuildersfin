@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import type { Account, IncomeSource, Bill, Expense } from "@/lib/cashflow-types";
+import type { Account, IncomeSource, Bill, Expense, Debt, SavingsGoal } from "@/lib/cashflow-types";
 
 const KEY = "cashflow-blueprint-v1";
 
@@ -8,6 +8,8 @@ interface CashFlowState {
   income: IncomeSource[];
   bills: Bill[];
   expenses: Expense[];
+  debts: Debt[];
+  goals: SavingsGoal[];
 }
 
 function isoInDays(d: number): string {
@@ -37,25 +39,39 @@ const seed: CashFlowState = {
     { id: "e7", description: "Spotify", merchant: "Spotify", amount: 12, category: "Subscriptions", date: isoInDays(-9) },
     { id: "e8", description: "Overdraft fee", merchant: "Bank", amount: 35, category: "Fees", date: isoInDays(-10) },
   ],
+  debts: [
+    { id: "d1", name: "Credit Card", balance: 2400, min_payment: 60, interest_rate: 24, due_date: isoInDays(15) },
+    { id: "d2", name: "Car Loan", balance: 8200, min_payment: 240, interest_rate: 7, due_date: isoInDays(18) },
+  ],
+  goals: [
+    { id: "g1", name: "Emergency fund", type: "Emergency fund", target_amount: 1000, current_amount: 220, monthly_contribution: 100, target_date: isoInDays(240) },
+  ],
 };
+
+function migrate(s: any): CashFlowState {
+  return {
+    accounts: s.accounts ?? [],
+    income: s.income ?? [],
+    bills: s.bills ?? [],
+    expenses: s.expenses ?? [],
+    debts: s.debts ?? [],
+    goals: s.goals ?? [],
+  };
+}
 
 export function useCashFlow() {
   const [state, setState] = useState<CashFlowState>(() => {
     if (typeof window === "undefined") return seed;
     try {
       const raw = localStorage.getItem(KEY);
-      return raw ? (JSON.parse(raw) as CashFlowState) : seed;
+      return raw ? migrate(JSON.parse(raw)) : seed;
     } catch {
       return seed;
     }
   });
 
   useEffect(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      /* ignore */
-    }
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignore */ }
   }, [state]);
 
   const addAccount = useCallback((a: Omit<Account, "id">) =>
@@ -84,12 +100,28 @@ export function useCashFlow() {
   const removeExpense = useCallback((id: string) =>
     setState(s => ({ ...s, expenses: s.expenses.filter(x => x.id !== id) })), []);
 
+  const addDebt = useCallback((d: Omit<Debt, "id">) =>
+    setState(s => ({ ...s, debts: [...s.debts, { ...d, id: crypto.randomUUID() }] })), []);
+  const updateDebt = useCallback((id: string, patch: Partial<Debt>) =>
+    setState(s => ({ ...s, debts: s.debts.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+  const removeDebt = useCallback((id: string) =>
+    setState(s => ({ ...s, debts: s.debts.filter(x => x.id !== id) })), []);
+
+  const addGoal = useCallback((g: Omit<SavingsGoal, "id">) =>
+    setState(s => ({ ...s, goals: [...s.goals, { ...g, id: crypto.randomUUID() }] })), []);
+  const updateGoal = useCallback((id: string, patch: Partial<SavingsGoal>) =>
+    setState(s => ({ ...s, goals: s.goals.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+  const removeGoal = useCallback((id: string) =>
+    setState(s => ({ ...s, goals: s.goals.filter(x => x.id !== id) })), []);
+
   return {
     ...state,
     addAccount, updateAccount, removeAccount,
     addIncome, removeIncome,
     addBill, updateBill, removeBill,
     addExpense, updateExpense, removeExpense,
+    addDebt, updateDebt, removeDebt,
+    addGoal, updateGoal, removeGoal,
   };
 }
 
