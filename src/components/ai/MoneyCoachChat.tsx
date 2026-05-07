@@ -1,33 +1,94 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Sparkles, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import type { CashFlow } from "@/hooks/useCashFlow";
+import {
+  todaysInsights, whereInsights, fixInsights, futureInsights, type MoneyInsight,
+} from "@/lib/ai-insights";
+import { calcFIN, calcFutureValue } from "@/lib/financial-calculations";
 
 type Msg = { role: "user" | "assistant"; content: string };
+export type CoachTab = "today" | "where" | "fix" | "future";
 
-const SUGGESTED = [
-  "Where am I leaking money?",
-  "Can I afford to spend $100 today?",
-  "Which debt should I pay first?",
-  "Am I on track for retirement?",
-];
+const TAB_LABEL: Record<CoachTab, string> = {
+  today: "Today's Money",
+  where: "Where It Went",
+  fix: "Fix My Money",
+  future: "Future Blueprint",
+};
+
+const SUGGESTED: Record<CoachTab, string[]> = {
+  today: [
+    "Will I run out of money before my next paycheck?",
+    "What's safe for me to spend right now?",
+    "Which bill should I pay first?",
+  ],
+  where: [
+    "Where am I leaking money this month?",
+    "Which category should I cut?",
+    "How much am I spending on subscriptions?",
+  ],
+  fix: [
+    "Which debt should I pay first?",
+    "Snowball or avalanche for my debts?",
+    "Am I on track with my emergency fund?",
+  ],
+  future: [
+    "Am I on track to hit my FIN?",
+    "How much more should I contribute monthly?",
+    "When can I retire if I keep saving this much?",
+  ],
+};
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
-export default function MoneyCoachChat({ cf }: { cf: CashFlow }) {
+export default function MoneyCoachChat({ cf, tab }: { cf: CashFlow; tab: CoachTab }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Reset chat when switching tabs so context stays focused.
+  useEffect(() => { setMessages([]); }, [tab]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  // Pre-compute insight bundles for every tab, plus a key summary.
+  const bundles = useMemo(() => {
+    const totalCash = cf.accounts.reduce((s, a) => s + a.balance, 0);
+    const monthlyExpenses = cf.bills.filter(b => b.frequency === "monthly").reduce((s, b) => s + b.amount, 0) || 4000;
+    const fin = calcFIN(monthlyExpenses);
+    const projected = calcFutureValue(0, 500, 8, 30);
+    return {
+      today: todaysInsights({ totalCash, income: cf.income, bills: cf.bills, expenses: cf.expenses }),
+      where: whereInsights(cf.expenses),
+      fix: fixInsights({ debts: cf.debts, goals: cf.goals }),
+      future: futureInsights({
+        fin, currentInvestments: 0, projected, monthlyContribution: 500, yearsToRetire: 30,
+      }),
+    } as Record<CoachTab, MoneyInsight[]>;
+  }, [cf]);
+
+  // Pick the most relevant tab for a free-form question by keyword matching.
+  const pickTopic = (q: string): CoachTab => {
+    const t = q.toLowerCase();
+    if (/debt|credit card|loan|interest|snowball|avalanche|payoff|emergency fund|savings? goal/.test(t)) return "fix";
+    if (/retire|fin |financial independence|invest|compound|future|projection|contribute/.test(t)) return "future";
+    if (/spend|category|leak|subscription|food|restaurant|coffee|shopping|merchant|where/.test(t)) return "where";
+    if (/paycheck|safe to spend|today|tomorrow|overdraft|bill|due|cash on hand|balance/.test(t)) return "today";
+    return tab;
+  };
+
+  const flat = (insights: MoneyInsight[]) =>
+    insights.map(i => `- [${i.tone}] ${i.title} | Why: ${i.why} | Next: ${i.action} | Impact: ${i.impact}`).join("\n") || "(no insights)";
 
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
@@ -37,7 +98,29 @@ export default function MoneyCoachChat({ cf }: { cf: CashFlow }) {
     setInput("");
     setLoading(true);
 
+    const focus = pickTopic(text);
+    const totalCash = cf.accounts.reduce((s, a) => s + a.balance, 0);
+
     const context = {
+      active_tab: tab,
+      tab_label: TAB_LABEL[tab],
+      focus_topic: focus,
+      focus_topic_label: TAB_LABEL[focus],
+      summary: {
+        cash_on_hand: totalCash,
+        paychecks: cf.income.length,
+        upcoming_bills: cf.bills.length,
+        recent_transactions: cf.expenses.length,
+        debts: cf.debts.length,
+        savings_goals: cf.goals.length,
+      },
+      // Always include the insights for the active tab AND the inferred focus tab.
+      insights_active_tab: bundles[tab],
+      insights_focus_tab: bundles[focus],
+      insights_summary_text:
+        `ACTIVE TAB (${TAB_LABEL[tab]}):\n${flat(bundles[tab])}\n\n` +
+        (focus !== tab ? `MOST RELEVANT TAB (${TAB_LABEL[focus]}):\n${flat(bundles[focus])}\n\n` : ``),
+      // Raw data for deeper questions.
       accounts: cf.accounts,
       income: cf.income,
       bills: cf.bills,
@@ -90,6 +173,8 @@ export default function MoneyCoachChat({ cf }: { cf: CashFlow }) {
     }
   };
 
+  const tabSuggestions = SUGGESTED[tab];
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -110,7 +195,7 @@ export default function MoneyCoachChat({ cf }: { cf: CashFlow }) {
             </div>
             <div>
               <p className="font-semibold leading-tight">AI Money Coach</p>
-              <p className="text-[11px] text-muted-foreground">Plain-language money help</p>
+              <p className="text-[11px] text-muted-foreground">Focused on {TAB_LABEL[tab]}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
@@ -120,9 +205,13 @@ export default function MoneyCoachChat({ cf }: { cf: CashFlow }) {
           <div ref={scrollRef} className="space-y-3">
             {messages.length === 0 && (
               <div className="space-y-3 py-2">
-                <p className="text-sm text-muted-foreground">Ask anything about your money. Try:</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-[10px]">Context: {TAB_LABEL[tab]}</Badge>
+                  <span className="text-[11px] text-muted-foreground">{bundles[tab].length} active insight{bundles[tab].length === 1 ? "" : "s"}</span>
+                </div>
+                <p className="text-sm text-muted-foreground">Ask about this tab — or anything money-related:</p>
                 <div className="grid gap-2">
-                  {SUGGESTED.map(s => (
+                  {tabSuggestions.map(s => (
                     <button key={s} onClick={() => send(s)}
                       className="text-left text-sm rounded-lg border p-3 hover:bg-accent transition-colors">
                       {s}
@@ -148,7 +237,7 @@ export default function MoneyCoachChat({ cf }: { cf: CashFlow }) {
             <Input
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Ask about your money…"
+              placeholder={`Ask about ${TAB_LABEL[tab]}…`}
               disabled={loading}
             />
             <Button type="submit" size="icon" disabled={loading || !input.trim()}>

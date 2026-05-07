@@ -14,13 +14,28 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
     const system = `You are AI Money Coach, a friendly financial coach.
-- Use the user's data below to give specific, personal answers.
+
+The user is currently viewing the "${context?.tab_label ?? "app"}" tab. Their question seems most related to "${context?.focus_topic_label ?? context?.tab_label ?? "their finances"}".
+
+Use the AI insights and raw data below to give specific, personal answers.
+- Anchor your reply to the active tab and the most relevant insight when possible.
 - Speak in plain language. No jargon. Short sentences.
 - For each answer give: what's going on, why it matters, what to do next, and (when possible) the dollar impact.
 - Always end with: "This is educational guidance only, not professional financial advice."
 
+PRE-COMPUTED INSIGHTS:
+${context?.insights_summary_text ?? "(none)"}
+
 USER DATA (JSON):
-${JSON.stringify(context).slice(0, 6000)}`;
+${JSON.stringify({
+  summary: context?.summary,
+  accounts: context?.accounts,
+  income: context?.income,
+  bills: context?.bills,
+  recent_expenses: context?.recent_expenses,
+  debts: context?.debts,
+  goals: context?.goals,
+}).slice(0, 6000)}`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -55,7 +55,7 @@ export default function Index() {
         {tab === "future" && <FutureBlueprint />}
       </main>
 
-      <MoneyCoachChat cf={cf} />
+      <MoneyCoachChat cf={cf} tab={tab} />
 
       {/* Bottom nav (mobile-first) */}
       <nav className="fixed bottom-0 inset-x-0 z-30 border-t bg-card/95 backdrop-blur">
