@@ -79,8 +79,18 @@ export function useCashFlow() {
 
   const addExpense = useCallback((e: Omit<Expense, "id">) =>
     setState(s => ({ ...s, expenses: [...s.expenses, { ...e, id: crypto.randomUUID() }] })), []);
+  const updateExpense = useCallback((id: string, patch: Partial<Expense>) =>
+    setState(s => ({ ...s, expenses: s.expenses.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
   const removeExpense = useCallback((id: string) =>
     setState(s => ({ ...s, expenses: s.expenses.filter(x => x.id !== id) })), []);
+
+  return {
+    ...state,
+    addAccount, updateAccount, removeAccount,
+    addIncome, removeIncome,
+    addBill, updateBill, removeBill,
+    addExpense, updateExpense, removeExpense,
+  };
 
   return {
     ...state,
