@@ -86,3 +86,39 @@ export function daysUntil(iso: string): number {
   target.setHours(0, 0, 0, 0);
   return Math.round((target.getTime() - today.getTime()) / 86400000);
 }
+
+/* ---------------- Debt & Savings ---------------- */
+
+export interface Debt {
+  id: string;
+  name: string;
+  balance: number;
+  min_payment: number;
+  interest_rate: number; // APR %
+  due_date: string;      // ISO
+  created_at?: string;
+}
+
+export type SavingsGoalType =
+  | "Emergency fund"
+  | "Car"
+  | "Home"
+  | "Vacation"
+  | "Business"
+  | "Retirement"
+  | "Custom";
+
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  type: SavingsGoalType;
+  target_amount: number;
+  current_amount: number;
+  monthly_contribution: number;
+  target_date: string;   // ISO
+  created_at?: string;
+}
+
+export const SAVINGS_GOAL_TYPES: SavingsGoalType[] = [
+  "Emergency fund", "Car", "Home", "Vacation", "Business", "Retirement", "Custom",
+];
