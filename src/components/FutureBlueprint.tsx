@@ -100,9 +100,9 @@ export default function FutureBlueprint() {
 
       {/* Contribution needed to reach FIN */}
       <ContributionToFin
+        currentAge={deferred.currentAge}
         currentInvestments={deferred.currentInvestments}
         annualReturn={deferred.expectedReturn}
-        years={yearsToRetire}
         fin={fin}
         currentMonthly={deferred.monthlyContribution}
         onApply={(v) => set("monthlyContribution", v)}
