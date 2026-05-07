@@ -12,6 +12,8 @@ import type { CashFlow } from "@/hooks/useCashFlow";
 import {
   buildTimeline, firstOverdraft, billsThisMonth, spendingThisMonth, calcSafeToSpend,
 } from "@/lib/cashflow-engine";
+import { todaysInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 type Freq = "once" | "weekly" | "biweekly" | "monthly";
 
