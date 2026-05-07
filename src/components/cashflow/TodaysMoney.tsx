@@ -42,6 +42,11 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     [totalCash, cf.income, cf.bills],
   );
 
+  const insights = useMemo(
+    () => todaysInsights({ totalCash, income: cf.income, bills: cf.bills, expenses: cf.expenses }),
+    [totalCash, cf.income, cf.bills, cf.expenses],
+  );
+
   return (
     <div className="space-y-4">
       {/* SNAPSHOT */}
