@@ -49,6 +49,17 @@ export default function BookReviewDialog() {
       existing.push({ ...parsed.data, created_at: new Date().toISOString() });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
     } catch { /* ignore */ }
+    void fireEvent("appointment.requested", {
+      ...parsed.data,
+      source_form: "book_review_dialog",
+      destination: "google_calendar",
+    });
+    void fireEvent("lead.captured", {
+      name: parsed.data.name,
+      email: parsed.data.email,
+      financial_concern: "Financial review request",
+      destination: "gohighlevel",
+    });
     setConfirmed(parsed.data);
     setSubmitting(false);
     toast.success("Booking received!");
