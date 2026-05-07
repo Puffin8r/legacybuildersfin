@@ -91,14 +91,6 @@ export function useCashFlow() {
     addBill, updateBill, removeBill,
     addExpense, updateExpense, removeExpense,
   };
-
-  return {
-    ...state,
-    addAccount, updateAccount, removeAccount,
-    addIncome, removeIncome,
-    addBill, updateBill, removeBill,
-    addExpense, removeExpense,
-  };
 }
 
 export type CashFlow = ReturnType<typeof useCashFlow>;
