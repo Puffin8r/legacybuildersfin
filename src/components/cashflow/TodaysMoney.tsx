@@ -48,6 +48,20 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     [totalCash, cf.income, cf.bills, cf.expenses],
   );
 
+  // Fire overdraft webhook once per unique (date,ending) signature
+  const lastOverdraftSig = useRef<string | null>(null);
+  useEffect(() => {
+    if (!overdraft) return;
+    const sig = `${overdraft.date}:${overdraft.ending.toFixed(2)}`;
+    if (lastOverdraftSig.current === sig) return;
+    lastOverdraftSig.current = sig;
+    void fireEvent("overdraft.warning", {
+      predicted_date: overdraft.date,
+      predicted_balance: overdraft.ending,
+      cash_on_hand: totalCash,
+    });
+  }, [overdraft, totalCash]);
+
   return (
     <div className="space-y-4">
       {/* SNAPSHOT */}
