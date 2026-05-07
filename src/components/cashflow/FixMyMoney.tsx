@@ -407,7 +407,7 @@ function MonthlyReset({ cf }: { cf: CashFlow }) {
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const totalIncome = cf.income.reduce((sum, i) => {
     // approximate based on frequency
-    const per = i.frequency === "weekly" ? 4 : i.frequency === "biweekly" ? 2 : i.frequency === "monthly" ? 1 : i.frequency === "yearly" ? 0 : 1;
+    const per = i.frequency === "weekly" ? 4 : i.frequency === "biweekly" ? 2 : i.frequency === "monthly" ? 1 : 0;
     if (i.frequency === "once" || i.frequency === "one-time") {
       const d = new Date(i.next_date);
       return d >= monthStart && d <= monthEnd ? sum + i.amount : sum;
