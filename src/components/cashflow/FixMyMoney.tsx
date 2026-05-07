@@ -18,6 +18,8 @@ import { calcSafeToSpend, billsThisMonth, spendingThisMonth, buildTimeline, firs
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { fixInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
+import { toast } from "sonner";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
   const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
