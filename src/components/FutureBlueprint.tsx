@@ -100,9 +100,9 @@ export default function FutureBlueprint() {
 
       {/* Contribution needed to reach FIN */}
       <ContributionToFin
+        currentAge={deferred.currentAge}
         currentInvestments={deferred.currentInvestments}
         annualReturn={deferred.expectedReturn}
-        years={yearsToRetire}
         fin={fin}
         currentMonthly={deferred.monthlyContribution}
         onApply={(v) => set("monthlyContribution", v)}
@@ -199,11 +199,13 @@ function requiredMonthly(target: number, present: number, annualRate: number, ye
 }
 
 function ContributionToFin({
-  currentInvestments, annualReturn, years, fin, currentMonthly, onApply,
+  currentAge, currentInvestments, annualReturn, fin, currentMonthly, onApply,
 }: {
-  currentInvestments: number; annualReturn: number; years: number;
+  currentAge: number; currentInvestments: number; annualReturn: number;
   fin: number; currentMonthly: number; onApply: (v: number) => void;
 }) {
+  const [targetAge, setTargetAge] = useState(65);
+  const years = Math.max(targetAge - currentAge, 1);
   const needed = requiredMonthly(fin, currentInvestments, annualReturn, years);
   const rounded = Math.ceil(needed / 5) * 5;
   const gap = rounded - currentMonthly;
@@ -213,9 +215,10 @@ function ContributionToFin({
     <Card className="border-accent/40 bg-accent/5">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2"><Target className="h-4 w-4 text-accent"/>Contribution to reach FIN</CardTitle>
-        <p className="text-xs text-muted-foreground">How much per month to hit your number by retirement.</p>
+        <p className="text-xs text-muted-foreground">How much per month to hit your number by your target age.</p>
       </CardHeader>
       <CardContent className="space-y-3">
+        <Field label="Target retirement age" value={targetAge} onChange={setTargetAge} />
         {alreadyThere ? (
           <p className="text-sm font-medium text-success">You're already projected to exceed FIN at this return — no extra contribution needed.</p>
         ) : (
