@@ -10,6 +10,8 @@ import {
 import { TrendingUp, Target, Clock, Coins, CalendarCheck } from "lucide-react";
 import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency } from "@/lib/financial-calculations";
 import BookReviewDialog from "@/components/BookReviewDialog";
+import { futureInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 interface SimpleInputs {
   currentAge: number;
