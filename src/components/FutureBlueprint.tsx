@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import { TrendingUp, Target, Clock, Coins, CalendarCheck } from "lucide-react";
 import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency } from "@/lib/financial-calculations";
-import { toast } from "sonner";
+import BookReviewDialog from "@/components/BookReviewDialog";
 
 interface SimpleInputs {
   currentAge: number;
@@ -148,9 +148,7 @@ export default function FutureBlueprint() {
           <CalendarCheck className="h-8 w-8 text-primary mx-auto"/>
           <p className="font-heading text-lg font-bold">Want help making this real?</p>
           <p className="text-sm text-muted-foreground">A 30-minute review can simplify your plan and save years.</p>
-          <Button size="lg" className="w-full" onClick={() => toast.success("Thanks! We'll reach out to schedule.")}>
-            Book a Financial Review
-          </Button>
+          <BookReviewDialog />
         </CardContent>
       </Card>
     </div>
