@@ -18,6 +18,7 @@ import { calcSafeToSpend } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { whereInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { fireEvent } from "@/lib/integrations";
 
 const COLORS = [
   "hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))",
