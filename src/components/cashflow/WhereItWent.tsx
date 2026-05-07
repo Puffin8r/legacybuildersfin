@@ -430,17 +430,8 @@ function TransactionEntry({ cf }: { cf: CashFlow }) {
         <div className="pt-3">
           <p className="text-xs uppercase text-muted-foreground tracking-wide mb-2">Recent</p>
           <div className="space-y-1">
-            {cf.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0, 12).map(e => (
-              <div key={e.id} className="flex items-center justify-between text-sm border-b pb-1">
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{e.merchant || e.description || e.category}</p>
-                  <p className="text-xs text-muted-foreground">{e.category} · {new Date(e.date).toLocaleDateString()}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">-{formatMoney(e.amount)}</span>
-                  <Button size="icon" variant="ghost" onClick={() => cf.removeExpense(e.id)}><Trash2 className="h-4 w-4"/></Button>
-                </div>
-              </div>
+            {cf.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0, 20).map(e => (
+              <TransactionRow key={e.id} expense={e} cf={cf} />
             ))}
           </div>
         </div>
