@@ -28,11 +28,14 @@ const seed: CashFlowState = {
     { id: "b4", name: "Streaming", amount: 18, due_date: isoInDays(20), frequency: "monthly", is_essential: false },
   ],
   expenses: [
-    { id: "e1", description: "Groceries", amount: 64, category: "Food", date: isoInDays(-1) },
-    { id: "e2", description: "Coffee", amount: 6, category: "Food", date: isoInDays(-1) },
-    { id: "e3", description: "Gas", amount: 38, category: "Transport", date: isoInDays(-2) },
-    { id: "e4", description: "Takeout", amount: 22, category: "Food", date: isoInDays(-3) },
-    { id: "e5", description: "Online order", amount: 45, category: "Shopping", date: isoInDays(-5) },
+    { id: "e1", description: "Groceries", merchant: "Kroger", amount: 64, category: "Food", date: isoInDays(-1) },
+    { id: "e2", description: "Coffee", merchant: "Starbucks", amount: 6, category: "Food", date: isoInDays(-1) },
+    { id: "e3", description: "Gas", merchant: "Shell", amount: 38, category: "Gas", date: isoInDays(-2) },
+    { id: "e4", description: "Takeout", merchant: "Chipotle", amount: 22, category: "Food", date: isoInDays(-3) },
+    { id: "e5", description: "Online order", merchant: "Amazon", amount: 45, category: "Shopping", date: isoInDays(-5) },
+    { id: "e6", description: "Netflix", merchant: "Netflix", amount: 16, category: "Subscriptions", date: isoInDays(-7) },
+    { id: "e7", description: "Spotify", merchant: "Spotify", amount: 12, category: "Subscriptions", date: isoInDays(-9) },
+    { id: "e8", description: "Overdraft fee", merchant: "Bank", amount: 35, category: "Fees", date: isoInDays(-10) },
   ],
 };
 
