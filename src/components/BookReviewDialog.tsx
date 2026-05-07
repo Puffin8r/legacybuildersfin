@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarCheck, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { fireEvent } from "@/lib/integrations";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(100),
