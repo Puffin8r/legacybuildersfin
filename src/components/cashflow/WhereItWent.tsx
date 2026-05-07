@@ -439,3 +439,96 @@ function TransactionEntry({ cf }: { cf: CashFlow }) {
     </Card>
   );
 }
+
+/* ---------------- Editable transaction row ---------------- */
+
+function TransactionRow({ expense, cf }: { expense: Expense; cf: CashFlow }) {
+  const [editing, setEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [date, setDate] = useState(expense.date.slice(0, 10));
+  const [amount, setAmount] = useState(String(expense.amount));
+  const [merchant, setMerchant] = useState(expense.merchant ?? "");
+  const [category, setCategory] = useState<ExpenseCategory>(expense.category);
+  const [description, setDescription] = useState(expense.description ?? "");
+  const [error, setError] = useState<string | null>(null);
+
+  const reset = () => {
+    setDate(expense.date.slice(0, 10));
+    setAmount(String(expense.amount));
+    setMerchant(expense.merchant ?? "");
+    setCategory(expense.category);
+    setDescription(expense.description ?? "");
+    setError(null);
+  };
+
+  const save = () => {
+    const parsed = txSchema.safeParse({
+      date,
+      amount: parseFloat(amount),
+      merchant: merchant || undefined,
+      category,
+      description: description || undefined,
+    });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
+    cf.updateExpense(expense.id, {
+      date: parsed.data.date,
+      amount: parsed.data.amount,
+      merchant: parsed.data.merchant,
+      category: parsed.data.category,
+      description: parsed.data.description ?? "",
+    });
+    setEditing(false);
+    setError(null);
+  };
+
+  if (editing) {
+    return (
+      <div className="rounded-lg border bg-muted/40 p-2 space-y-2">
+        <div className="grid grid-cols-2 gap-2">
+          <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="h-8 text-xs"/>
+          <Input type="number" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} className="h-8 text-xs" maxLength={10}/>
+        </div>
+        <Input placeholder="Merchant" value={merchant} onChange={e => setMerchant(e.target.value)} className="h-8 text-xs" maxLength={80}/>
+        <select value={category} onChange={e => setCategory(e.target.value as ExpenseCategory)}
+          className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs">
+          {EXPENSE_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+        </select>
+        <Input placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} className="h-8 text-xs" maxLength={200}/>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        <div className="flex gap-2">
+          <Button size="sm" className="flex-1 h-8" onClick={save}><Check className="h-3.5 w-3.5 mr-1"/>Save</Button>
+          <Button size="sm" variant="outline" className="h-8" onClick={() => { reset(); setEditing(false); }}><X className="h-3.5 w-3.5"/></Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (confirmDelete) {
+    return (
+      <div className="flex items-center justify-between rounded-lg border border-destructive/40 bg-destructive/5 p-2 text-xs">
+        <span>Delete this transaction?</span>
+        <div className="flex gap-1">
+          <Button size="sm" variant="destructive" className="h-7" onClick={() => cf.removeExpense(expense.id)}>Delete</Button>
+          <Button size="sm" variant="outline" className="h-7" onClick={() => setConfirmDelete(false)}>Cancel</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-between text-sm border-b pb-1 group">
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium">{expense.merchant || expense.description || expense.category}</p>
+        <p className="text-xs text-muted-foreground">{expense.category} · {new Date(expense.date).toLocaleDateString()}</p>
+      </div>
+      <div className="flex items-center gap-0.5">
+        <span className="font-medium mr-1">-{formatMoney(expense.amount)}</span>
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditing(true)} aria-label="Edit"><Pencil className="h-3.5 w-3.5"/></Button>
+        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setConfirmDelete(true)} aria-label="Delete"><Trash2 className="h-3.5 w-3.5"/></Button>
+      </div>
+    </div>
+  );
+}
