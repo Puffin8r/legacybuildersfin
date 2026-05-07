@@ -5,6 +5,7 @@ import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
 import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
+import MoneyCoachChat from "@/components/ai/MoneyCoachChat";
 import { cn } from "@/lib/utils";
 
 type Tab = "today" | "where" | "fix" | "future";
@@ -49,6 +50,8 @@ export default function Index() {
         {tab === "fix"    && <FixMyMoney cf={cf} />}
         {tab === "future" && <FutureBlueprint />}
       </main>
+
+      <MoneyCoachChat cf={cf} />
 
       {/* Bottom nav (mobile-first) */}
       <nav className="fixed bottom-0 inset-x-0 z-30 border-t bg-card/95 backdrop-blur">

@@ -1,0 +1,4 @@
+project_id = "ogdduklcougqjnbcicpo"
+
+[functions.money-coach-chat]
+verify_jwt = false

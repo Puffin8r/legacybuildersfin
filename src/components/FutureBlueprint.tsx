@@ -10,6 +10,8 @@ import {
 import { TrendingUp, Target, Clock, Coins, CalendarCheck } from "lucide-react";
 import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency } from "@/lib/financial-calculations";
 import BookReviewDialog from "@/components/BookReviewDialog";
+import { futureInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 interface SimpleInputs {
   currentAge: number;
@@ -49,10 +51,17 @@ export default function FutureBlueprint() {
     [deferred, yearsToRetire],
   );
 
+  const insights = useMemo(() => futureInsights({
+    fin, currentInvestments: deferred.currentInvestments, projected,
+    monthlyContribution: deferred.monthlyContribution, yearsToRetire,
+  }), [fin, deferred.currentInvestments, projected, deferred.monthlyContribution, yearsToRetire]);
+
   const set = <K extends keyof SimpleInputs>(k: K, v: number) => setInputs(p => ({ ...p, [k]: v }));
 
   return (
     <div className="space-y-4">
+      <InsightList insights={insights} />
+
       {/* Intro */}
       <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
         <CardContent className="p-4">

@@ -16,6 +16,8 @@ import {
 } from "@/lib/cashflow-types";
 import { calcSafeToSpend } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
+import { whereInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 const COLORS = [
   "hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))",
@@ -58,6 +60,8 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
   const risk = riskLevel(safe.amount, totalCash);
   const leaks = useMemo(() => detectLeaks(cf.expenses, cf.bills), [cf.expenses, cf.bills]);
 
+  const insights = useMemo(() => whereInsights(cf.expenses), [cf.expenses]);
+
   return (
     <div className="space-y-4">
       {/* HEADER CARD */}
@@ -68,6 +72,8 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
           <p className="text-sm text-muted-foreground">spent in the last 30 days</p>
         </CardContent>
       </Card>
+
+      <InsightList insights={insights} />
 
       {/* RISK METER */}
       <RiskMeter risk={risk} safeAmount={safe.amount} />

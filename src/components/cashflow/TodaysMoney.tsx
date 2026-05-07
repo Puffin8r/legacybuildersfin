@@ -12,6 +12,8 @@ import type { CashFlow } from "@/hooks/useCashFlow";
 import {
   buildTimeline, firstOverdraft, billsThisMonth, spendingThisMonth, calcSafeToSpend,
 } from "@/lib/cashflow-engine";
+import { todaysInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 type Freq = "once" | "weekly" | "biweekly" | "monthly";
 
@@ -40,6 +42,11 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     [totalCash, cf.income, cf.bills],
   );
 
+  const insights = useMemo(
+    () => todaysInsights({ totalCash, income: cf.income, bills: cf.bills, expenses: cf.expenses }),
+    [totalCash, cf.income, cf.bills, cf.expenses],
+  );
+
   return (
     <div className="space-y-4">
       {/* SNAPSHOT */}
@@ -60,6 +67,8 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
           </div>
         </CardContent>
       </Card>
+
+      <InsightList insights={insights} />
 
       {/* SAFE TO SPEND */}
       <SafeToSpendCard safe={safe} />

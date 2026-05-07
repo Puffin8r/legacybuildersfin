@@ -16,10 +16,14 @@ import {
 } from "@/lib/cashflow-types";
 import { calcSafeToSpend, billsThisMonth, spendingThisMonth, buildTimeline, firstOverdraft } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
+import { fixInsights } from "@/lib/ai-insights";
+import { InsightList } from "@/components/ai/InsightCard";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
+  const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
   return (
     <div className="space-y-4">
+      <InsightList insights={insights} />
       <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
         <CardContent className="p-4 flex items-start gap-3">
           <Sparkles className="h-6 w-6 text-primary shrink-0 mt-0.5"/>
