@@ -293,7 +293,9 @@ function BillPlanner({ cf }: { cf: CashFlow }) {
             <div className="flex gap-2">
               <Button className="flex-1" onClick={() => {
                 if (!name || !amount) return;
-                cf.addBill({ name, amount: parseFloat(amount), due_date: date, frequency: freq, is_essential: essential });
+                const payload = { name, amount: parseFloat(amount), due_date: date, frequency: freq, is_essential: essential };
+                cf.addBill(payload);
+                void fireEvent("transaction.added", { type: "bill", ...payload });
                 setName(""); setAmount(""); setOpen(false);
               }}>Add bill</Button>
               <Button variant="outline" onClick={()=>setOpen(false)}>Cancel</Button>
