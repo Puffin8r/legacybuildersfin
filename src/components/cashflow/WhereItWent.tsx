@@ -9,7 +9,7 @@ import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell,
 } from "recharts";
 import {
-  Trash2, Plus, AlertTriangle, Repeat, Coffee, CreditCard, ReceiptText, TrendingUp, Copy, Lightbulb,
+  Trash2, Plus, AlertTriangle, Repeat, Coffee, CreditCard, ReceiptText, TrendingUp, Copy, Lightbulb, Pencil, Check, X,
 } from "lucide-react";
 import {
   EXPENSE_CATEGORIES, formatMoney, type ExpenseCategory, type Expense,
