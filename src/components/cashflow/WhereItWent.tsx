@@ -388,13 +388,15 @@ function TransactionEntry({ cf }: { cf: CashFlow }) {
       setError(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
     }
-    cf.addExpense({
+    const tx = {
       description: parsed.data.description ?? "",
       merchant: parsed.data.merchant,
       amount: parsed.data.amount,
       category: parsed.data.category,
       date: parsed.data.date,
-    });
+    };
+    cf.addExpense(tx);
+    void fireEvent("transaction.added", { ...tx, source: "manual_entry" });
     setAmount(""); setMerchant(""); setDescription("");
   };
 
