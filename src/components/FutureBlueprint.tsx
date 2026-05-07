@@ -182,3 +182,67 @@ function Metric({ icon: Icon, label, value, hint }: { icon: typeof Target; label
     </Card>
   );
 }
+
+/* ---------------- Required monthly contribution to hit FIN ----------------
+   FV formula solved for PMT:
+     FV = PV*(1+r)^n + PMT * ((1+r)^n - 1)/r
+     PMT = (FV - PV*(1+r)^n) * r / ((1+r)^n - 1)
+   r = monthly rate, n = months
+*/
+function requiredMonthly(target: number, present: number, annualRate: number, years: number): number {
+  const months = Math.max(years * 12, 1);
+  const r = annualRate / 100 / 12;
+  const growth = Math.pow(1 + r, months);
+  const fvOfPresent = present * growth;
+  const need = target - fvOfPresent;
+  if (need <= 0) return 0;
+  if (r === 0) return need / months;
+  return (need * r) / (growth - 1);
+}
+
+function ContributionToFin({
+  currentInvestments, annualReturn, years, fin, currentMonthly, onApply,
+}: {
+  currentInvestments: number; annualReturn: number; years: number;
+  fin: number; currentMonthly: number; onApply: (v: number) => void;
+}) {
+  const needed = requiredMonthly(fin, currentInvestments, annualReturn, years);
+  const rounded = Math.ceil(needed / 5) * 5;
+  const gap = rounded - currentMonthly;
+  const alreadyThere = needed === 0;
+
+  return (
+    <Card className="border-accent/40 bg-accent/5">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2"><Target className="h-4 w-4 text-accent"/>Contribution to reach FIN</CardTitle>
+        <p className="text-xs text-muted-foreground">How much per month to hit your number by retirement.</p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {alreadyThere ? (
+          <p className="text-sm font-medium text-success">You're already projected to exceed FIN at this return — no extra contribution needed.</p>
+        ) : (
+          <>
+            <div>
+              <p className="text-3xl font-bold font-heading">{formatCurrency(rounded)}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+              <p className="text-xs text-muted-foreground">
+                Saving this for {years} {years === 1 ? "year" : "years"} at {annualReturn}% return reaches {formatCurrency(fin)}.
+              </p>
+            </div>
+            <div className="text-sm rounded-lg bg-background/70 border p-3">
+              <div className="flex justify-between"><span className="text-muted-foreground">You're saving now</span><span className="font-semibold">{formatCurrency(currentMonthly)}/mo</span></div>
+              <div className="flex justify-between mt-1">
+                <span className="text-muted-foreground">{gap > 0 ? "Increase by" : "Surplus"}</span>
+                <span className={`font-semibold ${gap > 0 ? "text-destructive" : "text-success"}`}>
+                  {gap > 0 ? "+" : ""}{formatCurrency(Math.abs(gap))}/mo
+                </span>
+              </div>
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => onApply(rounded)}>
+              Use {formatCurrency(rounded)}/mo in projection
+            </Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
