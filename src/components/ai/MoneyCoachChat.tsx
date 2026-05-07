@@ -268,15 +268,37 @@ export default function MoneyCoachChat({ cf, tab }: { cf: CashFlow; tab: CoachTa
                 </div>
               </div>
             )}
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm whitespace-pre-wrap ${
-                  m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                }`}>
-                  {m.content || <span className="opacity-60">Thinking…</span>}
+            {messages.map((m, i) => {
+              const isLast = i === messages.length - 1;
+              const showFollowups =
+                isLast && m.role === "assistant" && !!m.content && !loading;
+              const askedSet = new Set(messages.filter(x => x.role === "user").map(x => x.content));
+              const followups = showFollowups ? pickFollowUps(m.content, tab, askedSet) : [];
+              return (
+                <div key={i} className="space-y-2">
+                  <div className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm whitespace-pre-wrap ${
+                      m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                    }`}>
+                      {m.content || <span className="opacity-60">Thinking…</span>}
+                    </div>
+                  </div>
+                  {showFollowups && followups.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pl-1">
+                      {followups.map(q => (
+                        <button
+                          key={q}
+                          onClick={() => send(q)}
+                          className="text-xs rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 text-foreground px-3 py-1.5 transition-colors"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </ScrollArea>
 
