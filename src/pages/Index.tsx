@@ -11,6 +11,7 @@ import FutureBlueprint from "@/components/FutureBlueprint";
 import MoneyCoachChat, { type CoachTab, SUGGESTED } from "@/components/ai/MoneyCoachChat";
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
 import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
+import BookReviewDialog from "@/components/BookReviewDialog";
 import { cn } from "@/lib/utils";
 
 type Tab = CoachTab;
