@@ -105,6 +105,10 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
     }
     setSubs(prev => [...prev, ...detectedFromExpenses]);
     toast.success(`Added ${detectedFromExpenses.length} possible subscription${detectedFromExpenses.length === 1 ? "" : "s"}`);
+    detectedFromExpenses.forEach(s => fireEvent("subscription_detected", {
+      source: "expense_history",
+      merchant: s.merchant, monthly_amount: s.monthly_amount, category: s.category, last_charged: s.last_charged,
+    }));
   }
 
   /** Pull Plaid recurring streams (demo until live) and merge into subs.
@@ -125,6 +129,11 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
       result.unchanged       && `${result.unchanged} unchanged`,
     ].filter(Boolean);
     toast.success(`Synced from bank: ${parts.join(" · ") || "nothing new"}`);
+    result.added.forEach(s => fireEvent("subscription_detected", {
+      source: "plaid_recurring",
+      merchant: s.merchant, monthly_amount: s.monthly_amount, category: s.category,
+      plaid_stream_id: s.plaid_stream_id, last_charged: s.last_charged,
+    }));
   }
 
   function handleCSV(file: File) {
