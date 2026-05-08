@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Upload, Sparkles, TrendingUp, AlertTriangle, LineChart as LineChartIcon, Banknote } from "lucide-react";
+import { Plus, Trash2, Upload, Sparkles, TrendingUp, AlertTriangle, LineChart as LineChartIcon, Banknote, Brain } from "lucide-react";
 import { formatMoney, EXPENSE_CATEGORIES, type ExpenseCategory } from "@/lib/cashflow-types";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { toast } from "sonner";
