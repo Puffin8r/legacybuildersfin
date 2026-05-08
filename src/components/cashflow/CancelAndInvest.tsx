@@ -279,8 +279,11 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
 
       {/* Import actions */}
       <Card>
-        <CardContent className="p-3 grid grid-cols-2 gap-2">
-          <Button variant="outline" className="w-full" onClick={importDetected}>
+        <CardContent className="p-3 grid grid-cols-3 gap-2">
+          <Button variant="outline" className="w-full text-xs px-2" onClick={syncFromBank}>
+            <Banknote className="h-4 w-4 mr-1"/>Sync bank
+          </Button>
+          <Button variant="outline" className="w-full text-xs px-2" onClick={importDetected}>
             <Sparkles className="h-4 w-4 mr-1"/>Detect ({detectedFromExpenses.length})
           </Button>
           <label className="w-full">
@@ -288,12 +291,16 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
               type="file" accept=".csv" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) handleCSV(f); e.target.value = ""; }}
             />
-            <Button variant="outline" className="w-full" asChild>
-              <span><Upload className="h-4 w-4 mr-1"/>Upload CSV</span>
+            <Button variant="outline" className="w-full text-xs px-2" asChild>
+              <span><Upload className="h-4 w-4 mr-1"/>CSV</span>
             </Button>
           </label>
         </CardContent>
       </Card>
+
+      <p className="text-[11px] text-muted-foreground px-1">
+        Bank-detected subscriptions update automatically as Plaid finds new charges. Bank data may take several hours to refresh.
+      </p>
 
       <AddSubscription onAdd={s => setSubs(prev => [...prev, s])}/>
 
