@@ -65,7 +65,12 @@ export default function RetirementIncomePlanner() {
 
   const yearsToRetire = Math.max(deferred.retirementAge - deferred.currentAge, 1);
   const desiredAnnual = deferred.desiredMonthlyIncome * 12;
-  const requiredPortfolio = desiredAnnual / 0.04;
+
+  // Inflation: desired income is in today's dollars. Future nominal target grows with inflation.
+  const inflationRate = Math.max(deferred.inflationRate, 0);
+  const inflationFactor = Math.pow(1 + inflationRate / 100, yearsToRetire);
+  const requiredPortfolioToday = desiredAnnual / 0.04;
+  const requiredPortfolio = requiredPortfolioToday * inflationFactor; // nominal target at retirement
 
   const monthlyNeeded = useMemo(
     () => requiredMonthly(requiredPortfolio, deferred.currentSavings, deferred.expectedReturn, yearsToRetire),
@@ -79,12 +84,22 @@ export default function RetirementIncomePlanner() {
 
   // Slider for "what if I contribute X/month"
   const [whatIf, setWhatIf] = useState(roundedNeeded || 500);
-  const projection = useMemo(
+  const projectionRaw = useMemo(
     () => calcProjectionData(deferred.currentSavings, whatIf, deferred.expectedReturn, yearsToRetire),
     [deferred.currentSavings, whatIf, deferred.expectedReturn, yearsToRetire],
   );
+  // Add today's-dollar (real) value alongside nominal
+  const projection = useMemo(
+    () => projectionRaw.map(p => ({
+      ...p,
+      real: p.value / Math.pow(1 + inflationRate / 100, p.year),
+    })),
+    [projectionRaw, inflationRate],
+  );
   const projectedFinal = projection[projection.length - 1]?.value ?? 0;
+  const projectedFinalReal = projection[projection.length - 1]?.real ?? 0;
   const projectedMonthlyIncome = (projectedFinal * 0.04) / 12;
+  const projectedMonthlyIncomeReal = (projectedFinalReal * 0.04) / 12;
 
   // Milestones at fixed ages between current and retirement
   const milestoneAges = useMemo(() => {
@@ -99,7 +114,11 @@ export default function RetirementIncomePlanner() {
   const milestones = milestoneAges.map(age => {
     const yrs = age - deferred.currentAge;
     const idx = Math.min(yrs, projection.length - 1);
-    return { age, value: projection[idx]?.value ?? 0 };
+    return {
+      age,
+      value: projection[idx]?.value ?? 0,
+      real: projection[idx]?.real ?? 0,
+    };
   });
 
   // Roth IRA helper — limit depends on age
@@ -123,7 +142,7 @@ export default function RetirementIncomePlanner() {
   if (yearsEarlier > 0.5 && Number.isFinite(yearsAtBoosted)) {
     insights.push(`Increasing contributions by $150/month could allow you to retire ${yearsEarlier.toFixed(1)} years earlier.`);
   }
-  insights.push(`At a ${deferred.expectedReturn}% return, your investments could generate approximately ${formatCurrency(projectedMonthlyIncome)}/month in retirement income.`);
+  insights.push(`At a ${deferred.expectedReturn}% return, your investments could generate approximately ${formatCurrency(projectedMonthlyIncome)}/month (about ${formatCurrency(projectedMonthlyIncomeReal)}/mo in today's dollars after ${inflationRate}% inflation).`);
 
   return (
     <div className="space-y-4">
