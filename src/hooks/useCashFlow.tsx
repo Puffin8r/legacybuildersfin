@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { Account, IncomeSource, Bill, Expense, Debt, SavingsGoal } from "@/lib/cashflow-types";
 
 const KEY = "cashflow-blueprint-v1";
