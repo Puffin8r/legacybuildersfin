@@ -461,6 +461,32 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
   );
 }
 
+function CoachInsightsCard({ insights }: { insights: string[] }) {
+  if (insights.length === 0) return null;
+  return (
+    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-success/5">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Brain className="h-4 w-4 text-primary"/>AI Money Coach
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <ul className="space-y-2">
+          {insights.map((tip, i) => (
+            <li key={i} className="flex gap-2 text-sm leading-snug">
+              <Sparkles className="h-3.5 w-3.5 text-primary shrink-0 mt-1"/>
+              <span>{tip}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-[11px] text-muted-foreground border-t pt-2">
+          Investment projections are estimates and not guaranteed. Actual returns can vary.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 function StatTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className={`rounded-md border p-2 ${accent ? "bg-success/10 border-success/30" : "bg-background/60"}`}>
