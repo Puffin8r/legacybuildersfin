@@ -81,6 +81,13 @@ export default function Index() {
         cf={cf}
       />
 
+      <ManageDataSheet
+        open={manageOpen}
+        onOpenChange={setManageOpen}
+        cf={cf}
+        onReplay={() => setShowOnboarding(true)}
+      />
+
       {/* Bottom nav (mobile-first) — Today / Spending / Fix / Future / Coach */}
       <nav className="fixed bottom-0 inset-x-0 z-30 border-t bg-card/95 backdrop-blur">
         <div className="max-w-2xl mx-auto grid grid-cols-5">
