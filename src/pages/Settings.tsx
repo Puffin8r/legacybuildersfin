@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Building2, Webhook, Calendar, Users, Github, Upload, Sparkles, CheckCircle2, Send } from "lucide-react";
+import { ArrowLeft, Building2, Webhook, Calendar, Users, Github, Upload, Sparkles, CheckCircle2, Send, PlayCircle } from "lucide-react";
+import IntroVideoDialog from "@/components/IntroVideoDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,15 @@ export default function Settings() {
       </header>
 
       <main className="px-4 py-5 max-w-2xl mx-auto space-y-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2"><PlayCircle className="h-4 w-4" /> Intro video</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mb-3">Re-watch the quick walkthrough of how CashFlow Blueprint works.</p>
+            <IntroVideoDialog />
+          </CardContent>
+        </Card>
         <BankCard s={s} setS={setS} />
         <N8nCard s={s} setS={setS} />
         <CalendarCard s={s} setS={setS} />
