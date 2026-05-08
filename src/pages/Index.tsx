@@ -6,7 +6,7 @@ import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
 import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
-import MoneyCoachChat, { type CoachTab } from "@/components/ai/MoneyCoachChat";
+import MoneyCoachChat, { type CoachTab, SUGGESTED } from "@/components/ai/MoneyCoachChat";
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
 import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
 import { cn } from "@/lib/utils";
