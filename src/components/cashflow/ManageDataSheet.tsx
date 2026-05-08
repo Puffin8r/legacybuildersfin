@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Trash2, Plus, Wallet, Banknote, Receipt, ShoppingBag, RotateCcw, Sparkles } from "lucide-react";
+import { Trash2, Plus, Wallet, Banknote, Receipt, ShoppingBag, RotateCcw, Sparkles, Undo2 } from "lucide-react";
+import { toast } from "sonner";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { markOnboardingDone } from "@/components/onboarding/OnboardingDialog";
 
