@@ -3,9 +3,11 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ExternalLink } from "lucide-react";
+import { CalendarCheck, ExternalLink, Phone } from "lucide-react";
 
 const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
+const PHONE_NUMBER = "(951) 421-1177";
+const PHONE_HREF = "tel:+19514211177";
 
 export default function BookReviewDialog() {
   const [open, setOpen] = useState(false);
