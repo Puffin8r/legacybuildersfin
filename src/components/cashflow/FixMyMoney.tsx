@@ -392,10 +392,10 @@ function WeeklyCheckIn({ cf }: { cf: CashFlow }) {
   );
 }
 
-function CheckInRow({ icon: Icon, label, value, positive, negative }: { icon: typeof Target; label: string; value: string; positive?: boolean; negative?: boolean }) {
+function CheckInRow({ icon: Icon, label, value, positive, negative, tipKey }: { icon: typeof Target; label: string; value: string; positive?: boolean; negative?: boolean; tipKey?: "safeToSpend" | "overdraft" | "snowball" | "avalanche" | "ruleOf72" | "fin" }) {
   return (
     <div className="flex items-center justify-between border-b pb-2">
-      <div className="flex items-center gap-2 text-sm"><Icon className="h-4 w-4 text-muted-foreground"/>{label}</div>
+      <div className="flex items-center gap-2 text-sm"><Icon className="h-4 w-4 text-muted-foreground"/>{label}{tipKey && <InfoTip tip={tipKey} />}</div>
       <span className={`font-bold ${positive ? "text-success" : ""} ${negative ? "text-destructive" : ""}`}>{value}</span>
     </div>
   );
