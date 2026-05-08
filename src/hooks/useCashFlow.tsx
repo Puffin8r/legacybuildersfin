@@ -83,6 +83,8 @@ export function useCashFlow() {
 
   const addIncome = useCallback((i: Omit<IncomeSource, "id">) =>
     setState(s => ({ ...s, income: [...s.income, { ...i, id: crypto.randomUUID() }] })), []);
+  const updateIncome = useCallback((id: string, patch: Partial<IncomeSource>) =>
+    setState(s => ({ ...s, income: s.income.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
   const removeIncome = useCallback((id: string) =>
     setState(s => ({ ...s, income: s.income.filter(x => x.id !== id) })), []);
 
