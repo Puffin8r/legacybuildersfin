@@ -192,8 +192,34 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
               We'll create a cancellation task for our support team. They will reach out with next steps.
               No payment details are shared.
             </p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Your name</Label>
+                <Input value={name} onChange={e => setName(e.target.value.slice(0, 80))} maxLength={80} className="h-8"/>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Preferred contact</Label>
+                <select
+                  value={pref}
+                  onChange={e => setPref(e.target.value as "email" | "phone" | "sms")}
+                  className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
+                >
+                  <option value="email">Email</option>
+                  <option value="phone">Phone call</option>
+                  <option value="sms">Text (SMS)</option>
+                </select>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Email</Label>
+                <Input type="email" value={email} onChange={e => setEmail(e.target.value.slice(0, 120))} maxLength={120} className="h-8"/>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Phone</Label>
+                <Input type="tel" value={phone} onChange={e => setPhone(e.target.value.slice(0, 30))} maxLength={30} className="h-8"/>
+              </div>
+            </div>
             <Textarea
-              placeholder="Optional: account email, last-4 of card, or anything that helps us cancel."
+              placeholder="Optional notes (account email, last-4 of card, anything that helps us cancel)."
               value={notes}
               onChange={e => setNotes(e.target.value.slice(0, 500))}
               maxLength={500}
