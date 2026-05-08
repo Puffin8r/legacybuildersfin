@@ -95,6 +95,17 @@ function pickFollowUps(reply: string, tab: CoachTab, asked: Set<string>): string
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
+// Per-topic recent prompts saved across sessions.
+const RECENT_KEY = "coach-recent-prompts-v1";
+type RecentMap = Partial<Record<CoachTab, string[]>>;
+function loadRecent(): RecentMap {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "{}"); } catch { return {}; }
+}
+function saveRecent(m: RecentMap) {
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(m)); } catch { /* ignore */ }
+}
+
 export default function MoneyCoachChat({
   cf, tab, open: openProp, onOpenChange, hideFab, initialPrompt, onPromptConsumed,
 }: {
