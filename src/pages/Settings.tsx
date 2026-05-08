@@ -45,7 +45,7 @@ export default function Settings() {
             <CardTitle className="text-base flex items-center gap-2"><PlayCircle className="h-4 w-4" /> Intro video</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-3">Re-watch the quick walkthrough of how CashFlow Blueprint works.</p>
+            <p className="text-xs text-muted-foreground mb-3">Re-watch the quick walkthrough of how LegacyBuilders works.</p>
             <IntroVideoDialog />
           </CardContent>
         </Card>
@@ -173,7 +173,7 @@ function N8nCard({ s, setS }: { s: IntegrationSettings; setS: (x: IntegrationSet
   const test = async () => {
     if (!s.n8nWebhookUrl) { toast.error("Paste a webhook URL first"); return; }
     setTesting(true);
-    const r = await fireEvent("transaction.added", { test: true, message: "Hello from CashFlow Blueprint" });
+    const r = await fireEvent("transaction.added", { test: true, message: "Hello from LegacyBuilders" });
     setTesting(false);
     if (r.ok) toast.success("Test event sent. Check your n8n workflow.");
     else toast.error(r.reason || "Failed to send");

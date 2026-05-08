@@ -60,7 +60,7 @@ export default function Index() {
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold">$</div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-base font-bold font-heading leading-tight">CashFlow Blueprint</h1>
+              <h1 className="text-base font-bold font-heading leading-tight">LegacyBuilders</h1>
               <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
             </div>
             <button

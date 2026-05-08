@@ -1,4 +1,4 @@
-// Supabase-ready data structures for CashFlow Blueprint.
+// Supabase-ready data structures for LegacyBuilders.
 // When Lovable Cloud is enabled, mirror these as tables with the same columns.
 
 export interface Account {

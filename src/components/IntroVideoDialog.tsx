@@ -22,7 +22,7 @@ export default function IntroVideoDialog({
       </DialogTrigger>
       <DialogContent className="max-w-2xl p-4">
         <DialogHeader>
-          <DialogTitle>How CashFlow Blueprint works</DialogTitle>
+          <DialogTitle>How LegacyBuilders works</DialogTitle>
         </DialogHeader>
         <div className="rounded-lg overflow-hidden bg-black">
           {open && (

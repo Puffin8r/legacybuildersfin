@@ -85,7 +85,7 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
 
   function submitRequest() {
     if (!confirm)   { toast.error("Please confirm cancellation."); return; }
-    if (!authorize) { toast.error("Please authorize CashFlow Blueprint to help."); return; }
+    if (!authorize) { toast.error("Please authorize LegacyBuilders to help."); return; }
     if (!name.trim() || (pref === "email" && !email.trim()) || (pref !== "email" && !phone.trim())) {
       toast.error("Please fill in your name and preferred contact info.");
       return;
@@ -229,7 +229,7 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
             <ConfirmRow
               checked={authorize}
               onChange={setAuthorize}
-              label="I authorize CashFlow Blueprint to help process this cancellation request."
+              label="I authorize LegacyBuilders to help process this cancellation request."
             />
             <Button className="w-full" onClick={submitRequest} disabled={!confirm || !authorize}>
               <Mail className="h-4 w-4 mr-1"/>Request cancellation help
@@ -248,7 +248,7 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
                 <ConfirmRow
                   checked={authorize}
                   onChange={setAuthorize}
-                  label="I authorize CashFlow Blueprint to cancel this subscription on my behalf."
+                  label="I authorize LegacyBuilders to cancel this subscription on my behalf."
                 />
                 <Button className="w-full" onClick={submitApi} disabled={!confirm || !authorize}>
                   <Zap className="h-4 w-4 mr-1"/>Cancel now

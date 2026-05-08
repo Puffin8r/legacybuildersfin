@@ -1,5 +1,5 @@
 // Plaid-ready bank service. Currently backed by localStorage (matches the
-// rest of CashFlow Blueprint). The function shapes mirror what a Supabase
+// rest of LegacyBuilders). The function shapes mirror what a Supabase
 // + Plaid implementation would look like, so the UI layer never changes.
 //
 // To go live with Plaid:
