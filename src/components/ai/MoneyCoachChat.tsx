@@ -95,8 +95,18 @@ function pickFollowUps(reply: string, tab: CoachTab, asked: Set<string>): string
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
-export default function MoneyCoachChat({ cf, tab }: { cf: CashFlow; tab: CoachTab }) {
-  const [open, setOpen] = useState(false);
+export default function MoneyCoachChat({
+  cf, tab, open: openProp, onOpenChange, hideFab,
+}: {
+  cf: CashFlow;
+  tab: CoachTab;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideFab?: boolean;
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = openProp ?? internalOpen;
+  const setOpen = (v: boolean) => { onOpenChange ? onOpenChange(v) : setInternalOpen(v); };
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
