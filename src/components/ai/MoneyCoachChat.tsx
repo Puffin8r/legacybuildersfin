@@ -235,15 +235,17 @@ export default function MoneyCoachChat({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="fixed bottom-20 right-4 z-40 h-14 rounded-full shadow-lg gap-2 px-5 bg-gradient-to-r from-primary to-secondary"
-        >
-          <Sparkles className="h-5 w-5" />
-          <span className="hidden sm:inline">Ask AI Money Coach</span>
-          <span className="sm:hidden">Coach</span>
-        </Button>
-      </DialogTrigger>
+      {!hideFab && (
+        <DialogTrigger asChild>
+          <Button
+            className="fixed bottom-20 right-4 z-40 h-14 rounded-full shadow-lg gap-2 px-5 bg-gradient-to-r from-primary to-secondary"
+          >
+            <Sparkles className="h-5 w-5" />
+            <span className="hidden sm:inline">Ask AI Money Coach</span>
+            <span className="sm:hidden">Coach</span>
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-md p-0 gap-0 h-[85vh] flex flex-col">
         <DialogTitle className="sr-only">AI Money Coach</DialogTitle>
         <div className="flex items-center justify-between p-4 border-b">
