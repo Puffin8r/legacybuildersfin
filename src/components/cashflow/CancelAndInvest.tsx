@@ -14,6 +14,7 @@ import {
   type Subscription, type SubscriptionUsage as Usage, type SubscriptionStatus as CancelStatus,
 } from "@/lib/subscription-service";
 import { loadAccounts as loadBankAccounts } from "@/lib/bank-service";
+import CancelDialog from "./CancelDialog";
 
 /* ============================================================
    Cancel & Invest
