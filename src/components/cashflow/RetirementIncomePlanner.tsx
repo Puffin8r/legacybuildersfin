@@ -251,7 +251,12 @@ export default function RetirementIncomePlanner() {
 
       {/* Growth projection chart */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-base">Retirement growth projection</CardTitle></CardHeader>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Retirement growth projection</CardTitle>
+          {inflationRate > 0 && (
+            <p className="text-xs text-muted-foreground">Solid = future dollars · Dashed = today's dollars (inflation-adjusted)</p>
+          )}
+        </CardHeader>
         <CardContent>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -267,13 +272,17 @@ export default function RetirementIncomePlanner() {
                 <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
                   tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={50}/>
                 <Tooltip
-                  formatter={(v: number) => formatCurrency(v)}
+                  formatter={(v: number, name) => [formatCurrency(v), name === "real" ? "Today's $" : "Future $"]}
                   labelFormatter={y => `Age ${deferred.currentAge + Number(y)}`}
                 />
                 <ReferenceLine y={requiredPortfolio} stroke="hsl(var(--primary))" strokeDasharray="4 4"
                   label={{ value: "Goal", position: "right", fill: "hsl(var(--primary))", fontSize: 10 }} />
-                <Area type="monotone" dataKey="value" stroke="hsl(var(--accent))" fill="url(#rip)"
+                <Area type="monotone" dataKey="value" name="Future $" stroke="hsl(var(--accent))" fill="url(#rip)"
                   strokeWidth={2} isAnimationActive={false}/>
+                {inflationRate > 0 && (
+                  <Area type="monotone" dataKey="real" name="Today's $" stroke="hsl(var(--primary))" fill="none"
+                    strokeWidth={2} strokeDasharray="4 4" isAnimationActive={false}/>
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -289,6 +298,9 @@ export default function RetirementIncomePlanner() {
               <div key={m.age} className="rounded-lg border bg-card p-3">
                 <p className="text-xs text-muted-foreground">Age {m.age}</p>
                 <p className="text-base font-bold font-heading">{formatCurrency(m.value)}</p>
+                {inflationRate > 0 && (
+                  <p className="text-[10px] text-muted-foreground">≈ {formatCurrency(m.real)} today</p>
+                )}
               </div>
             ))}
           </div>
