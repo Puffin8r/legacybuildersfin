@@ -158,6 +158,11 @@ export default function RetirementIncomePlanner() {
           <p className="text-xs text-muted-foreground">
             in retirement at {deferred.expectedReturn}% return, contributing {formatCurrency(whatIf)}/mo.
           </p>
+          {inflationRate > 0 && (
+            <p className="text-xs text-accent font-medium">
+              ≈ {formatCurrency(projectedMonthlyIncomeReal)}/mo in today's dollars (after {inflationRate}% inflation)
+            </p>
+          )}
         </CardContent>
       </Card>
 
