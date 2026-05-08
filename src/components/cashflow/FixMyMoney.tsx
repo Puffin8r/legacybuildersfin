@@ -376,7 +376,7 @@ function WeeklyCheckIn({ cf }: { cf: CashFlow }) {
                 </div>
               ))}
           </div>
-          <CheckInRow icon={Target} label="Safe to spend" value={formatMoney(safe.amount)}
+          <CheckInRow icon={Target} label="Safe to spend" tipKey="safeToSpend" value={formatMoney(safe.amount)}
             positive={safe.amount >= 0} negative={safe.amount < 0}/>
           <div className="rounded-lg border bg-warning/10 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold"><Repeat className="h-4 w-4"/>Money leak to fix</div>
