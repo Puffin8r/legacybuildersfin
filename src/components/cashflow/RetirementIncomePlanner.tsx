@@ -65,7 +65,12 @@ export default function RetirementIncomePlanner() {
 
   const yearsToRetire = Math.max(deferred.retirementAge - deferred.currentAge, 1);
   const desiredAnnual = deferred.desiredMonthlyIncome * 12;
-  const requiredPortfolio = desiredAnnual / 0.04;
+
+  // Inflation: desired income is in today's dollars. Future nominal target grows with inflation.
+  const inflationRate = Math.max(deferred.inflationRate, 0);
+  const inflationFactor = Math.pow(1 + inflationRate / 100, yearsToRetire);
+  const requiredPortfolioToday = desiredAnnual / 0.04;
+  const requiredPortfolio = requiredPortfolioToday * inflationFactor; // nominal target at retirement
 
   const monthlyNeeded = useMemo(
     () => requiredMonthly(requiredPortfolio, deferred.currentSavings, deferred.expectedReturn, yearsToRetire),
@@ -79,12 +84,22 @@ export default function RetirementIncomePlanner() {
 
   // Slider for "what if I contribute X/month"
   const [whatIf, setWhatIf] = useState(roundedNeeded || 500);
-  const projection = useMemo(
+  const projectionRaw = useMemo(
     () => calcProjectionData(deferred.currentSavings, whatIf, deferred.expectedReturn, yearsToRetire),
     [deferred.currentSavings, whatIf, deferred.expectedReturn, yearsToRetire],
   );
+  // Add today's-dollar (real) value alongside nominal
+  const projection = useMemo(
+    () => projectionRaw.map(p => ({
+      ...p,
+      real: p.value / Math.pow(1 + inflationRate / 100, p.year),
+    })),
+    [projectionRaw, inflationRate],
+  );
   const projectedFinal = projection[projection.length - 1]?.value ?? 0;
+  const projectedFinalReal = projection[projection.length - 1]?.real ?? 0;
   const projectedMonthlyIncome = (projectedFinal * 0.04) / 12;
+  const projectedMonthlyIncomeReal = (projectedFinalReal * 0.04) / 12;
 
   // Milestones at fixed ages between current and retirement
   const milestoneAges = useMemo(() => {
@@ -99,7 +114,11 @@ export default function RetirementIncomePlanner() {
   const milestones = milestoneAges.map(age => {
     const yrs = age - deferred.currentAge;
     const idx = Math.min(yrs, projection.length - 1);
-    return { age, value: projection[idx]?.value ?? 0 };
+    return {
+      age,
+      value: projection[idx]?.value ?? 0,
+      real: projection[idx]?.real ?? 0,
+    };
   });
 
   // Roth IRA helper — limit depends on age
@@ -123,7 +142,7 @@ export default function RetirementIncomePlanner() {
   if (yearsEarlier > 0.5 && Number.isFinite(yearsAtBoosted)) {
     insights.push(`Increasing contributions by $150/month could allow you to retire ${yearsEarlier.toFixed(1)} years earlier.`);
   }
-  insights.push(`At a ${deferred.expectedReturn}% return, your investments could generate approximately ${formatCurrency(projectedMonthlyIncome)}/month in retirement income.`);
+  insights.push(`At a ${deferred.expectedReturn}% return, your investments could generate approximately ${formatCurrency(projectedMonthlyIncome)}/month (about ${formatCurrency(projectedMonthlyIncomeReal)}/mo in today's dollars after ${inflationRate}% inflation).`);
 
   return (
     <div className="space-y-4">
@@ -139,6 +158,11 @@ export default function RetirementIncomePlanner() {
           <p className="text-xs text-muted-foreground">
             in retirement at {deferred.expectedReturn}% return, contributing {formatCurrency(whatIf)}/mo.
           </p>
+          {inflationRate > 0 && (
+            <p className="text-xs text-accent font-medium">
+              ≈ {formatCurrency(projectedMonthlyIncomeReal)}/mo in today's dollars (after {inflationRate}% inflation)
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -163,7 +187,11 @@ export default function RetirementIncomePlanner() {
           <CardContent className="p-3">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Target className="h-3.5 w-3.5"/>Required portfolio</div>
             <p className="text-lg font-bold font-heading mt-1 leading-tight">{formatCurrency(requiredPortfolio)}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{formatCurrency(desiredAnnual)}/yr ÷ 4%</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {inflationRate > 0
+                ? `${formatCurrency(requiredPortfolioToday)} today, inflated ${inflationRate}%/yr`
+                : `${formatCurrency(desiredAnnual)}/yr ÷ 4%`}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -223,7 +251,12 @@ export default function RetirementIncomePlanner() {
 
       {/* Growth projection chart */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-base">Retirement growth projection</CardTitle></CardHeader>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Retirement growth projection</CardTitle>
+          {inflationRate > 0 && (
+            <p className="text-xs text-muted-foreground">Solid = future dollars · Dashed = today's dollars (inflation-adjusted)</p>
+          )}
+        </CardHeader>
         <CardContent>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -239,13 +272,17 @@ export default function RetirementIncomePlanner() {
                 <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
                   tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={50}/>
                 <Tooltip
-                  formatter={(v: number) => formatCurrency(v)}
+                  formatter={(v: number, name) => [formatCurrency(v), name === "real" ? "Today's $" : "Future $"]}
                   labelFormatter={y => `Age ${deferred.currentAge + Number(y)}`}
                 />
                 <ReferenceLine y={requiredPortfolio} stroke="hsl(var(--primary))" strokeDasharray="4 4"
                   label={{ value: "Goal", position: "right", fill: "hsl(var(--primary))", fontSize: 10 }} />
-                <Area type="monotone" dataKey="value" stroke="hsl(var(--accent))" fill="url(#rip)"
+                <Area type="monotone" dataKey="value" name="Future $" stroke="hsl(var(--accent))" fill="url(#rip)"
                   strokeWidth={2} isAnimationActive={false}/>
+                {inflationRate > 0 && (
+                  <Area type="monotone" dataKey="real" name="Today's $" stroke="hsl(var(--primary))" fill="none"
+                    strokeWidth={2} strokeDasharray="4 4" isAnimationActive={false}/>
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -261,6 +298,9 @@ export default function RetirementIncomePlanner() {
               <div key={m.age} className="rounded-lg border bg-card p-3">
                 <p className="text-xs text-muted-foreground">Age {m.age}</p>
                 <p className="text-base font-bold font-heading">{formatCurrency(m.value)}</p>
+                {inflationRate > 0 && (
+                  <p className="text-[10px] text-muted-foreground">≈ {formatCurrency(m.real)} today</p>
+                )}
               </div>
             ))}
           </div>
