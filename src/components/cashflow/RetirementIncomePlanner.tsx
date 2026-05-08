@@ -187,7 +187,11 @@ export default function RetirementIncomePlanner() {
           <CardContent className="p-3">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Target className="h-3.5 w-3.5"/>Required portfolio</div>
             <p className="text-lg font-bold font-heading mt-1 leading-tight">{formatCurrency(requiredPortfolio)}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{formatCurrency(desiredAnnual)}/yr ÷ 4%</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {inflationRate > 0
+                ? `${formatCurrency(requiredPortfolioToday)} today, inflated ${inflationRate}%/yr`
+                : `${formatCurrency(desiredAnnual)}/yr ÷ 4%`}
+            </p>
           </CardContent>
         </Card>
         <Card>
