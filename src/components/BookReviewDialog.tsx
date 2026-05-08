@@ -1,27 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CalendarCheck, ExternalLink } from "lucide-react";
 
-// Replace with your real Calendly event URL when ready.
 const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
 
 export default function BookReviewDialog() {
   const [open, setOpen] = useState(false);
-
-  // Lazy-load Calendly's widget script once when dialog opens.
-  useEffect(() => {
-    if (!open) return;
-    const id = "calendly-widget-script";
-    if (document.getElementById(id)) return;
-    const s = document.createElement("script");
-    s.id = id;
-    s.src = "https://assets.calendly.com/assets/external/widget.js";
-    s.async = true;
-    document.body.appendChild(s);
-  }, [open]);
+  const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -42,11 +30,15 @@ export default function BookReviewDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <div
-          className="calendly-inline-widget mt-2"
-          data-url={`${CALENDLY_URL}?hide_gdpr_banner=1`}
-          style={{ minWidth: "320px", height: "640px" }}
-        />
+        {open && (
+          <iframe
+            src={embedUrl}
+            title="Book a Financial Review"
+            className="w-full border-0"
+            style={{ height: "640px" }}
+            allow="camera; microphone; autoplay; encrypted-media; fullscreen; payment"
+          />
+        )}
 
         <div className="px-6 py-3 border-t bg-muted/30 flex items-center justify-between text-xs text-muted-foreground">
           <span>Powered by Calendly</span>
