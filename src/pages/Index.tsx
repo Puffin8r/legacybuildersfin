@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle, SlidersHorizontal } from "lucide-react";
+import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle, SlidersHorizontal, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
@@ -34,6 +36,10 @@ export default function Index() {
   const [manageOpen, setManageOpen] = useState(false);
   const [coachPrompt, setCoachPrompt] = useState<string | null>(null);
   const cf = useCashFlow();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => { await signOut(); navigate("/"); };
 
   const askCoach = (prompt: string, focus?: Tab) => {
     if (focus && focus !== tab) setTab(focus);
@@ -64,9 +70,17 @@ export default function Index() {
             >
               <SlidersHorizontal className="h-5 w-5" />
             </button>
-            <Link to="/settings" aria-label="Settings" className="p-2 -mr-2 rounded-md hover:bg-accent text-muted-foreground">
+            <Link to="/settings" aria-label="Settings" className="p-2 rounded-md hover:bg-accent text-muted-foreground">
               <SettingsIcon className="h-5 w-5" />
             </Link>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              aria-label="Sign out"
+              className="p-2 -mr-2 rounded-md hover:bg-accent text-muted-foreground"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </header>
