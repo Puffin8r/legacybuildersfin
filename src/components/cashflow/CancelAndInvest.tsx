@@ -59,6 +59,77 @@ function suggestionFor(s: Subscription, all: Subscription[]): string {
   return "Worth keeping if you use it weekly.";
 }
 
+/** AI Money Coach: deterministic, friendly, non-judgmental insights. */
+function buildCoachInsights(args: {
+  subs: Subscription[];
+  cancelable: Subscription[];
+  monthlySaved: number;
+  fv30: number;
+}): string[] {
+  const { subs, cancelable, monthlySaved, fv30 } = args;
+  const out: string[] = [];
+
+  // 1) Headline savings opportunity
+  const lowUse = subs.filter(s => s.usage === "Rarely" || s.usage === "Never");
+  const lowUseMonthly = lowUse.reduce((s, x) => s + x.monthly_amount, 0);
+  if (lowUse.length >= 1 && lowUseMonthly > 0) {
+    out.push(
+      `You could save ${formatMoney(lowUseMonthly)}/month by canceling ${lowUse.length} low-use subscription${lowUse.length === 1 ? "" : "s"}.`
+    );
+    const fvLow = futureValue(lowUseMonthly, 30);
+    out.push(
+      `If you invested that ${formatMoney(lowUseMonthly)}/month at 9%, it could grow to approximately ${formatMoney(fvLow)} over 30 years.`
+    );
+  } else if (subs.length === 0) {
+    out.push("Add or sync your subscriptions to see personalized savings ideas.");
+  } else {
+    out.push("Nice — none of your subscriptions are flagged as rarely used right now.");
+  }
+
+  // 2) Highest-cost candidate
+  if (subs.length > 0) {
+    const top = [...subs].sort((a, b) => b.monthly_amount - a.monthly_amount)[0];
+    if (top && top.monthly_amount >= 10) {
+      const rare = top.usage === "Rarely" || top.usage === "Never";
+      out.push(
+        rare
+          ? `Your highest-cost subscription is ${formatMoney(top.monthly_amount)}/month (${top.merchant}). Since you ${top.usage!.toLowerCase()} use it, this is a strong cancellation candidate.`
+          : `Your highest-cost subscription is ${formatMoney(top.monthly_amount)}/month (${top.merchant}). Worth a quick check: is it earning its keep?`
+      );
+    }
+  }
+
+  // 3) Duplicates in same category
+  const byCat: Record<string, Subscription[]> = {};
+  for (const s of subs) (byCat[s.category] ||= []).push(s);
+  const dupCat = Object.entries(byCat).find(([, list]) => list.length >= 2);
+  if (dupCat) {
+    const [cat, list] = dupCat;
+    out.push(
+      `You have ${list.length} ${cat.toLowerCase()} subscriptions. Keeping just your favorite could free up extra cash each month.`
+    );
+  }
+
+  // 4) Price increases
+  const raised = subs.filter(s => s.prev_amount && s.monthly_amount > s.prev_amount);
+  if (raised.length > 0) {
+    const r = raised[0];
+    const diff = r.monthly_amount - (r.prev_amount ?? 0);
+    out.push(
+      `${r.merchant} went up by ${formatMoney(diff)}/month. If the value still fits, great — if not, it's a fair time to reconsider.`
+    );
+  }
+
+  // 5) Already-selected savings reinforcement
+  if (cancelable.length > 0 && monthlySaved > 0) {
+    out.push(
+      `Great move — you've flagged ${formatMoney(monthlySaved)}/month to free up. Invested at 9%, that could become roughly ${formatMoney(fv30)} in 30 years.`
+    );
+  }
+
+  return out.slice(0, 5);
+}
+
 export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
   const [subs, setSubs] = useState<Subscription[]>(loadSubscriptions);
   useEffect(() => saveSubscriptions(subs), [subs]);
