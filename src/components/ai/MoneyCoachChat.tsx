@@ -96,13 +96,15 @@ function pickFollowUps(reply: string, tab: CoachTab, asked: Set<string>): string
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
 export default function MoneyCoachChat({
-  cf, tab, open: openProp, onOpenChange, hideFab,
+  cf, tab, open: openProp, onOpenChange, hideFab, initialPrompt, onPromptConsumed,
 }: {
   cf: CashFlow;
   tab: CoachTab;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   hideFab?: boolean;
+  initialPrompt?: string | null;
+  onPromptConsumed?: () => void;
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = openProp ?? internalOpen;
