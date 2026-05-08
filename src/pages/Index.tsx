@@ -32,7 +32,14 @@ export default function Index() {
   const [coachOpen, setCoachOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [coachPrompt, setCoachPrompt] = useState<string | null>(null);
   const cf = useCashFlow();
+
+  const askCoach = (prompt: string, focus?: Tab) => {
+    if (focus && focus !== tab) setTab(focus);
+    setCoachPrompt(prompt);
+    setCoachOpen(true);
+  };
   const meta = TITLES[tab];
 
   useEffect(() => {
