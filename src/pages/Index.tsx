@@ -31,6 +31,7 @@ export default function Index() {
   const [tab, setTab] = useState<Tab>("today");
   const [coachOpen, setCoachOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
   const cf = useCashFlow();
   const meta = TITLES[tab];
 
