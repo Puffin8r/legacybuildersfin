@@ -172,6 +172,15 @@ export default function MoneyCoachChat({
     setLoading(true);
 
     const focus = pickTopic(text);
+
+    // Save under whichever topic this prompt belongs to (focus wins).
+    setRecent(prev => {
+      const list = [text, ...(prev[focus] ?? []).filter(p => p !== text)].slice(0, 5);
+      const next = { ...prev, [focus]: list };
+      saveRecent(next);
+      return next;
+    });
+
     const totalCash = cf.accounts.reduce((s, a) => s + a.balance, 0);
 
     const context = {
