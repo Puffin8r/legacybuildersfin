@@ -199,11 +199,11 @@ function Field({ label, value, onChange, prefix, suffix }: { label: string; valu
   );
 }
 
-function Metric({ icon: Icon, label, value, hint }: { icon: typeof Target; label: string; value: string; hint?: string }) {
+function Metric({ icon: Icon, label, value, hint, tipKey }: { icon: typeof Target; label: string; value: string; hint?: string; tipKey?: "safeToSpend" | "overdraft" | "snowball" | "avalanche" | "ruleOf72" | "fin" }) {
   return (
     <Card>
       <CardContent className="p-3">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5"/>{label}</div>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5"/>{label}{tipKey && <InfoTip tip={tipKey} />}</div>
         <p className="text-lg font-bold font-heading mt-1 leading-tight">{value}</p>
         {hint && <p className="text-[10px] text-muted-foreground mt-0.5">{hint}</p>}
       </CardContent>
