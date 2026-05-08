@@ -4,47 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Upload, Sparkles, TrendingUp, AlertTriangle, LineChart as LineChartIcon } from "lucide-react";
+import { Plus, Trash2, Upload, Sparkles, TrendingUp, AlertTriangle, LineChart as LineChartIcon, Banknote } from "lucide-react";
 import { formatMoney, EXPENSE_CATEGORIES, type ExpenseCategory } from "@/lib/cashflow-types";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { toast } from "sonner";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceDot } from "recharts";
+import {
+  loadSubscriptions, saveSubscriptions, upsertFromPlaidRecurring, demoRecurringStreams,
+  type Subscription, type SubscriptionUsage as Usage, type SubscriptionStatus as CancelStatus,
+} from "@/lib/subscription-service";
+import { loadAccounts as loadBankAccounts } from "@/lib/bank-service";
 
 /* ============================================================
    Cancel & Invest
-   - Subscription detector (manual + CSV + auto-detect from expenses)
+   - Subscription detector (manual + CSV + auto-detect from expenses + Plaid recurring sync)
    - Suggests cancellations ranked by usage, cost, duplicates, etc.
    - Shows what canceled $ would grow into at 9% annually
    ============================================================ */
 
-type Usage = "Use Often" | "Sometimes" | "Rarely" | "Never";
-type CancelStatus = "Keep" | "Maybe Cancel" | "Cancel Requested" | "Canceled";
-type Frequency = "monthly" | "yearly" | "weekly";
-
-interface Subscription {
-  id: string;
-  merchant: string;
-  monthly_amount: number;
-  frequency: Frequency;
-  last_charged: string;
-  category: ExpenseCategory;
-  usage: Usage;
-  status: CancelStatus;
-  source: "manual" | "csv" | "detected" | "plaid";
-  prev_amount?: number; // for "increasing price"
-}
-
-const KEY = "cashflow-subscriptions-v1";
 const RETURN_RATE = 0.09;
 const NON_ESSENTIAL: ExpenseCategory[] = ["Subscriptions", "Entertainment", "Shopping", "Food"];
-
-function load(): Subscription[] {
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-  catch { return []; }
-}
-function save(list: Subscription[]) {
-  localStorage.setItem(KEY, JSON.stringify(list));
-}
 
 /** Future-value of a monthly contribution at 9% APR for N years. */
 function futureValue(monthly: number, years: number, rate = RETURN_RATE): number {
