@@ -2,3 +2,13 @@ project_id = "ogdduklcougqjnbcicpo"
 
 [functions.money-coach-chat]
 verify_jwt = false
+
+[functions.plaid-transactions]
+verify_jwt = false
+
+[functions.account-balance-updated]
+verify_jwt = false
+
+[functions.savings-goal-updated]
+verify_jwt = false
+
