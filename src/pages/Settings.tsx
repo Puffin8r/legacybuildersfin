@@ -15,6 +15,7 @@ import {
 } from "@/lib/integrations";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import type { Expense, ExpenseCategory } from "@/lib/cashflow-types";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Settings() {
   const [s, setS] = useState<IntegrationSettings>(() => loadSettings());
