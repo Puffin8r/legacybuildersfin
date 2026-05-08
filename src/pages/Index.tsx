@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle } from "lucide-react";
+import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle, SlidersHorizontal } from "lucide-react";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
@@ -8,6 +8,7 @@ import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
 import MoneyCoachChat, { type CoachTab } from "@/components/ai/MoneyCoachChat";
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
+import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
 import { cn } from "@/lib/utils";
 
 type Tab = CoachTab;
