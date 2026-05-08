@@ -94,7 +94,9 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
           <CardContent className="p-4 flex items-start gap-3">
             <ShieldAlert className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-destructive">Overdraft warning</p>
+              <p className="font-semibold text-destructive flex items-center gap-1">
+                Danger day ahead <InfoTip tip="overdraft" />
+              </p>
               <p className="text-sm">
                 You may hit <span className="font-bold">{formatMoney(overdraft.ending)}</span> on{" "}
                 <span className="font-medium">{new Date(overdraft.date).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" })}</span>.
