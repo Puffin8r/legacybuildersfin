@@ -408,6 +408,20 @@ export default function MoneyCoachChat({
         </ScrollArea>
 
         <div className="border-t p-3 space-y-2">
+          {showRecent && totalRecent > 0 && messages.length > 0 && (
+            <div className="rounded-lg border bg-muted/40 p-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold flex items-center gap-1.5">
+                  <History className="h-3.5 w-3.5 text-muted-foreground" /> Recent prompts
+                </p>
+                <button
+                  onClick={() => { setRecent({}); saveRecent({}); setShowRecent(false); }}
+                  className="text-[10px] text-muted-foreground hover:text-foreground"
+                >Clear</button>
+              </div>
+              <RecentList compact />
+            </div>
+          )}
           <form onSubmit={e => { e.preventDefault(); send(input); }} className="flex gap-2">
             <Input
               value={input}
