@@ -119,11 +119,13 @@ export function useCashFlow() {
   return {
     ...state,
     addAccount, updateAccount, removeAccount,
-    addIncome, removeIncome,
+    addIncome, updateIncome, removeIncome,
     addBill, updateBill, removeBill,
     addExpense, updateExpense, removeExpense,
     addDebt, updateDebt, removeDebt,
     addGoal, updateGoal, removeGoal,
+    resetAll: () => { try { localStorage.removeItem(KEY); } catch { /* ignore */ } setState(seed); },
+    clearAll: () => setState({ accounts: [], income: [], bills: [], expenses: [], debts: [], goals: [] }),
   };
 }
 
