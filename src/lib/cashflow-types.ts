@@ -116,6 +116,9 @@ export interface SavingsGoal {
   current_amount: number;
   monthly_contribution: number;
   target_date: string;   // ISO
+  /** Optional link to a connected savings bank account. When set, deposits
+   *  into that account auto-bump current_amount. */
+  linked_bank_account_id?: string;
   created_at?: string;
 }
 
