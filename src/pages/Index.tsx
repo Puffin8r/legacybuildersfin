@@ -164,3 +164,24 @@ export default function Index() {
     </div>
   );
 }
+
+function PromptGroup({
+  label, accent, prompts, onPick,
+}: { label: string; accent: string; prompts: string[]; onPick: (p: string) => void }) {
+  return (
+    <div>
+      <p className={cn("text-[11px] font-semibold uppercase tracking-wide mb-1.5", accent)}>{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {prompts.map(p => (
+          <button
+            key={p}
+            onClick={() => onPick(p)}
+            className="text-xs rounded-full border bg-background hover:bg-accent px-3 py-1.5 text-left transition-colors"
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
