@@ -17,6 +17,7 @@ import {
 import { ACCOUNT_TYPE_LABEL, type BankAccount, type BankAccountSubtype } from "@/lib/bank-types";
 import { formatMoney } from "@/lib/cashflow-types";
 import { fireEvent } from "@/lib/integrations";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 function timeAgo(iso?: string) {
   if (!iso) return "Never";
