@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle } from "lucide-react";
+import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle, SlidersHorizontal } from "lucide-react";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
@@ -8,6 +8,7 @@ import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
 import MoneyCoachChat, { type CoachTab } from "@/components/ai/MoneyCoachChat";
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
+import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
 import { cn } from "@/lib/utils";
 
 type Tab = CoachTab;
@@ -30,6 +31,7 @@ export default function Index() {
   const [tab, setTab] = useState<Tab>("today");
   const [coachOpen, setCoachOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
   const cf = useCashFlow();
   const meta = TITLES[tab];
 
@@ -47,6 +49,14 @@ export default function Index() {
               <h1 className="text-base font-bold font-heading leading-tight">CashFlow Blueprint</h1>
               <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setManageOpen(true)}
+              aria-label="Manage my money"
+              className="p-2 rounded-md hover:bg-accent text-muted-foreground"
+            >
+              <SlidersHorizontal className="h-5 w-5" />
+            </button>
             <Link to="/settings" aria-label="Settings" className="p-2 -mr-2 rounded-md hover:bg-accent text-muted-foreground">
               <SettingsIcon className="h-5 w-5" />
             </Link>
@@ -69,6 +79,13 @@ export default function Index() {
         onClose={() => setShowOnboarding(false)}
         onFinish={() => setTab("today")}
         cf={cf}
+      />
+
+      <ManageDataSheet
+        open={manageOpen}
+        onOpenChange={setManageOpen}
+        cf={cf}
+        onReplay={() => setShowOnboarding(true)}
       />
 
       {/* Bottom nav (mobile-first) — Today / Spending / Fix / Future / Coach */}

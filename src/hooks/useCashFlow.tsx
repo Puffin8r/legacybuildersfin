@@ -83,6 +83,8 @@ export function useCashFlow() {
 
   const addIncome = useCallback((i: Omit<IncomeSource, "id">) =>
     setState(s => ({ ...s, income: [...s.income, { ...i, id: crypto.randomUUID() }] })), []);
+  const updateIncome = useCallback((id: string, patch: Partial<IncomeSource>) =>
+    setState(s => ({ ...s, income: s.income.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
   const removeIncome = useCallback((id: string) =>
     setState(s => ({ ...s, income: s.income.filter(x => x.id !== id) })), []);
 
@@ -117,11 +119,13 @@ export function useCashFlow() {
   return {
     ...state,
     addAccount, updateAccount, removeAccount,
-    addIncome, removeIncome,
+    addIncome, updateIncome, removeIncome,
     addBill, updateBill, removeBill,
     addExpense, updateExpense, removeExpense,
     addDebt, updateDebt, removeDebt,
     addGoal, updateGoal, removeGoal,
+    resetAll: () => { try { localStorage.removeItem(KEY); } catch { /* ignore */ } setState(seed); },
+    clearAll: () => setState({ accounts: [], income: [], bills: [], expenses: [], debts: [], goals: [] }),
   };
 }
 
