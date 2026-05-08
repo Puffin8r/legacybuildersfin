@@ -175,9 +175,24 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
   const cancelable = subs.filter(s => s.status === "Maybe Cancel" || s.status === "Cancel Requested" || s.status === "Canceled");
   const monthlySaved = cancelable.reduce((s, x) => s + x.monthly_amount, 0);
   const yearlySaved  = monthlySaved * 12;
+  const fv5  = futureValue(monthlySaved, 5);
   const fv10 = futureValue(monthlySaved, 10);
   const fv20 = futureValue(monthlySaved, 20);
   const fv30 = futureValue(monthlySaved, 30);
+
+  // Yearly projection points for the chart (year 0..30)
+  const chartData = useMemo(() => {
+    if (monthlySaved <= 0) return [];
+    const pts: { year: number; value: number; contrib: number }[] = [];
+    for (let y = 0; y <= 30; y++) {
+      pts.push({
+        year: y,
+        value: Math.round(futureValue(monthlySaved, y)),
+        contrib: Math.round(monthlySaved * 12 * y),
+      });
+    }
+    return pts;
+  }, [monthlySaved]);
 
   function update(id: string, patch: Partial<Subscription>) {
     setSubs(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
