@@ -58,8 +58,8 @@ function suggestionFor(s: Subscription, all: Subscription[]): string {
 }
 
 export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
-  const [subs, setSubs] = useState<Subscription[]>(load);
-  useEffect(() => save(subs), [subs]);
+  const [subs, setSubs] = useState<Subscription[]>(loadSubscriptions);
+  useEffect(() => saveSubscriptions(subs), [subs]);
 
   // ---- Auto-detect from expense history ----
   const detectedFromExpenses = useMemo(() => {
