@@ -79,7 +79,7 @@ export default function AuthPage() {
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
               <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold text-lg">$</div>
-              <span className="font-heading font-bold text-lg">CashFlow Blueprint</span>
+              <span className="font-heading font-bold text-lg">LegacyBuilders</span>
             </Link>
             <h1 className="font-heading text-2xl font-bold mt-6">
               {mode === "signin" ? "Welcome back" : "Create your account"}

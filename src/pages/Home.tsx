@@ -29,7 +29,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold">$</div>
-            <span className="font-heading font-bold text-base">CashFlow Blueprint</span>
+            <span className="font-heading font-bold text-base">LegacyBuilders</span>
           </Link>
           <nav className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
             <a href="#features" className="hover:text-foreground">Features</a>
@@ -68,7 +68,7 @@ export default function Home() {
             The simplest way to fix today and build your future.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-            CashFlow Blueprint shows you what's safe to spend, where money is leaking,
+            LegacyBuilders shows you what's safe to spend, where money is leaking,
             and exactly how to turn small wins into long-term wealth.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -197,7 +197,7 @@ export default function Home() {
 
       <footer className="border-t py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} CashFlow Blueprint. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} LegacyBuilders. All rights reserved.</p>
           <p>Investment projections are estimates and not guaranteed.</p>
         </div>
       </footer>
