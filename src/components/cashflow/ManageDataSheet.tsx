@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Trash2, Plus, Wallet, Banknote, Receipt, ShoppingBag, RotateCcw, Sparkles } from "lucide-react";
+import { Trash2, Plus, Wallet, Banknote, Receipt, ShoppingBag, RotateCcw, Sparkles, Undo2 } from "lucide-react";
+import { toast } from "sonner";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { markOnboardingDone } from "@/components/onboarding/OnboardingDialog";
 
@@ -25,8 +26,21 @@ export default function ManageDataSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[88vh] overflow-y-auto p-0">
         <SheetHeader className="p-4 border-b sticky top-0 bg-card z-10">
-          <SheetTitle className="text-lg font-heading">Manage my money</SheetTitle>
-          <SheetDescription className="text-xs">Edit or remove anything you entered.</SheetDescription>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <SheetTitle className="text-lg font-heading">Manage my money</SheetTitle>
+              <SheetDescription className="text-xs">Edit or remove anything you entered.</SheetDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!cf.canUndo}
+              onClick={() => { if (cf.undo()) toast.success("Undid last change"); }}
+              className="shrink-0"
+            >
+              <Undo2 className="h-4 w-4 mr-1" /> Undo
+            </Button>
+          </div>
         </SheetHeader>
 
         <div className="p-4">

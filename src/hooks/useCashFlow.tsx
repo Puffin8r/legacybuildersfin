@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { Account, IncomeSource, Bill, Expense, Debt, SavingsGoal } from "@/lib/cashflow-types";
 
 const KEY = "cashflow-blueprint-v1";
@@ -60,7 +60,7 @@ function migrate(s: any): CashFlowState {
 }
 
 export function useCashFlow() {
-  const [state, setState] = useState<CashFlowState>(() => {
+  const [state, _setState] = useState<CashFlowState>(() => {
     if (typeof window === "undefined") return seed;
     try {
       const raw = localStorage.getItem(KEY);
@@ -70,51 +70,72 @@ export function useCashFlow() {
     }
   });
 
+  // Undo stack: snapshots of prior state, capped to 20 entries.
+  const historyRef = useRef<CashFlowState[]>([]);
+  const [undoCount, setUndoCount] = useState(0);
+
+  const setState = useCallback((updater: (s: CashFlowState) => CashFlowState) => {
+    _setState(prev => {
+      const next = updater(prev);
+      historyRef.current.push(prev);
+      if (historyRef.current.length > 20) historyRef.current.shift();
+      setUndoCount(historyRef.current.length);
+      return next;
+    });
+  }, []);
+
+  const undo = useCallback(() => {
+    const prev = historyRef.current.pop();
+    setUndoCount(historyRef.current.length);
+    if (prev) _setState(prev);
+    return !!prev;
+  }, []);
+
   useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignore */ }
   }, [state]);
 
   const addAccount = useCallback((a: Omit<Account, "id">) =>
-    setState(s => ({ ...s, accounts: [...s.accounts, { ...a, id: crypto.randomUUID() }] })), []);
+    setState(s => ({ ...s, accounts: [...s.accounts, { ...a, id: crypto.randomUUID() }] })), [setState]);
   const updateAccount = useCallback((id: string, patch: Partial<Account>) =>
-    setState(s => ({ ...s, accounts: s.accounts.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+    setState(s => ({ ...s, accounts: s.accounts.map(x => x.id === id ? { ...x, ...patch } : x) })), [setState]);
   const removeAccount = useCallback((id: string) =>
-    setState(s => ({ ...s, accounts: s.accounts.filter(x => x.id !== id) })), []);
+    setState(s => ({ ...s, accounts: s.accounts.filter(x => x.id !== id) })), [setState]);
 
   const addIncome = useCallback((i: Omit<IncomeSource, "id">) =>
-    setState(s => ({ ...s, income: [...s.income, { ...i, id: crypto.randomUUID() }] })), []);
+    setState(s => ({ ...s, income: [...s.income, { ...i, id: crypto.randomUUID() }] })), [setState]);
   const updateIncome = useCallback((id: string, patch: Partial<IncomeSource>) =>
-    setState(s => ({ ...s, income: s.income.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+    setState(s => ({ ...s, income: s.income.map(x => x.id === id ? { ...x, ...patch } : x) })), [setState]);
   const removeIncome = useCallback((id: string) =>
-    setState(s => ({ ...s, income: s.income.filter(x => x.id !== id) })), []);
+    setState(s => ({ ...s, income: s.income.filter(x => x.id !== id) })), [setState]);
 
   const addBill = useCallback((b: Omit<Bill, "id">) =>
-    setState(s => ({ ...s, bills: [...s.bills, { ...b, id: crypto.randomUUID() }] })), []);
+    setState(s => ({ ...s, bills: [...s.bills, { ...b, id: crypto.randomUUID() }] })), [setState]);
   const updateBill = useCallback((id: string, patch: Partial<Bill>) =>
-    setState(s => ({ ...s, bills: s.bills.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+    setState(s => ({ ...s, bills: s.bills.map(x => x.id === id ? { ...x, ...patch } : x) })), [setState]);
   const removeBill = useCallback((id: string) =>
-    setState(s => ({ ...s, bills: s.bills.filter(x => x.id !== id) })), []);
+    setState(s => ({ ...s, bills: s.bills.filter(x => x.id !== id) })), [setState]);
 
   const addExpense = useCallback((e: Omit<Expense, "id">) =>
-    setState(s => ({ ...s, expenses: [...s.expenses, { ...e, id: crypto.randomUUID() }] })), []);
+    setState(s => ({ ...s, expenses: [...s.expenses, { ...e, id: crypto.randomUUID() }] })), [setState]);
   const updateExpense = useCallback((id: string, patch: Partial<Expense>) =>
-    setState(s => ({ ...s, expenses: s.expenses.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+    setState(s => ({ ...s, expenses: s.expenses.map(x => x.id === id ? { ...x, ...patch } : x) })), [setState]);
   const removeExpense = useCallback((id: string) =>
-    setState(s => ({ ...s, expenses: s.expenses.filter(x => x.id !== id) })), []);
+    setState(s => ({ ...s, expenses: s.expenses.filter(x => x.id !== id) })), [setState]);
 
   const addDebt = useCallback((d: Omit<Debt, "id">) =>
-    setState(s => ({ ...s, debts: [...s.debts, { ...d, id: crypto.randomUUID() }] })), []);
+    setState(s => ({ ...s, debts: [...s.debts, { ...d, id: crypto.randomUUID() }] })), [setState]);
   const updateDebt = useCallback((id: string, patch: Partial<Debt>) =>
-    setState(s => ({ ...s, debts: s.debts.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+    setState(s => ({ ...s, debts: s.debts.map(x => x.id === id ? { ...x, ...patch } : x) })), [setState]);
   const removeDebt = useCallback((id: string) =>
-    setState(s => ({ ...s, debts: s.debts.filter(x => x.id !== id) })), []);
+    setState(s => ({ ...s, debts: s.debts.filter(x => x.id !== id) })), [setState]);
 
   const addGoal = useCallback((g: Omit<SavingsGoal, "id">) =>
-    setState(s => ({ ...s, goals: [...s.goals, { ...g, id: crypto.randomUUID() }] })), []);
+    setState(s => ({ ...s, goals: [...s.goals, { ...g, id: crypto.randomUUID() }] })), [setState]);
   const updateGoal = useCallback((id: string, patch: Partial<SavingsGoal>) =>
-    setState(s => ({ ...s, goals: s.goals.map(x => x.id === id ? { ...x, ...patch } : x) })), []);
+    setState(s => ({ ...s, goals: s.goals.map(x => x.id === id ? { ...x, ...patch } : x) })), [setState]);
   const removeGoal = useCallback((id: string) =>
-    setState(s => ({ ...s, goals: s.goals.filter(x => x.id !== id) })), []);
+    setState(s => ({ ...s, goals: s.goals.filter(x => x.id !== id) })), [setState]);
 
   return {
     ...state,
@@ -124,8 +145,10 @@ export function useCashFlow() {
     addExpense, updateExpense, removeExpense,
     addDebt, updateDebt, removeDebt,
     addGoal, updateGoal, removeGoal,
-    resetAll: () => { try { localStorage.removeItem(KEY); } catch { /* ignore */ } setState(seed); },
-    clearAll: () => setState({ accounts: [], income: [], bills: [], expenses: [], debts: [], goals: [] }),
+    undo,
+    canUndo: undoCount > 0,
+    resetAll: () => setState(() => seed),
+    clearAll: () => setState(() => ({ accounts: [], income: [], bills: [], expenses: [], debts: [], goals: [] })),
   };
 }
 
