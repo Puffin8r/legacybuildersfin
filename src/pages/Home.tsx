@@ -50,6 +50,20 @@ export default function Home() {
             <Sparkles className="h-3.5 w-3.5 text-primary" />
             Your money, finally clear
           </div>
+
+          {/* Intro video */}
+          <div className="max-w-2xl mx-auto mb-10">
+            <div className="rounded-2xl overflow-hidden border shadow-lg bg-black aspect-video">
+              <video
+                src="/intro-video.mp4"
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
           <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight max-w-3xl mx-auto">
             The simplest way to fix today and build your future.
           </h1>
