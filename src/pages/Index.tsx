@@ -11,6 +11,7 @@ import FutureBlueprint from "@/components/FutureBlueprint";
 import MoneyCoachChat, { type CoachTab, SUGGESTED } from "@/components/ai/MoneyCoachChat";
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
 import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
+import BookReviewDialog from "@/components/BookReviewDialog";
 import { cn } from "@/lib/utils";
 
 type Tab = CoachTab;
@@ -91,6 +92,15 @@ export default function Index() {
         {tab === "where"  && <WhereItWent cf={cf} />}
         {tab === "fix"    && <FixMyMoney cf={cf} />}
         {tab === "future" && <FutureBlueprint />}
+
+        {/* Book a financial review */}
+        <section className="mt-6 rounded-2xl border bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+          <h3 className="text-sm font-semibold mb-1">Want a hand from a real human?</h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Book a free 30-minute financial review with our team.
+          </p>
+          <BookReviewDialog />
+        </section>
 
         {/* Cross-tab Coach jump prompts */}
         <section className="mt-6 rounded-2xl border bg-card p-4">
