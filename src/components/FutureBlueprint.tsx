@@ -10,6 +10,7 @@ import {
 import { TrendingUp, Target, Clock, Coins, CalendarCheck } from "lucide-react";
 import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency } from "@/lib/financial-calculations";
 import BookReviewDialog from "@/components/BookReviewDialog";
+import RetirementIncomePlanner from "@/components/cashflow/RetirementIncomePlanner";
 import { futureInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
@@ -172,7 +173,10 @@ export default function FutureBlueprint() {
         </CardContent>
       </Card>
 
-      {/* Book CTA */}
+      {/* Retirement Income Planner */}
+      <RetirementIncomePlanner />
+
+
       <Card className="border-2 border-primary bg-primary/5">
         <CardContent className="p-5 text-center space-y-2">
           <CalendarCheck className="h-8 w-8 text-primary mx-auto"/>
