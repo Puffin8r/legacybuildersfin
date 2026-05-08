@@ -49,6 +49,14 @@ export default function Index() {
               <h1 className="text-base font-bold font-heading leading-tight">CashFlow Blueprint</h1>
               <p className="text-xs text-muted-foreground truncate">{meta.subtitle}</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setManageOpen(true)}
+              aria-label="Manage my money"
+              className="p-2 rounded-md hover:bg-accent text-muted-foreground"
+            >
+              <SlidersHorizontal className="h-5 w-5" />
+            </button>
             <Link to="/settings" aria-label="Settings" className="p-2 -mr-2 rounded-md hover:bg-accent text-muted-foreground">
               <SettingsIcon className="h-5 w-5" />
             </Link>
