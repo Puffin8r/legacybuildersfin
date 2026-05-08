@@ -4,6 +4,7 @@ import {
   Brain, LineChart, CheckCircle2, MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import BookReviewDialog from "@/components/BookReviewDialog";
 
 const FEATURES = [
   { icon: Wallet, title: "Today's Money", desc: "See exactly what's safe to spend right now — no spreadsheets required." },
@@ -60,9 +61,9 @@ export default function Home() {
             <Button asChild size="lg">
               <Link to="/app">Get started free <ArrowRight className="h-4 w-4" /></Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <a href="#features">See features</a>
-            </Button>
+            <div className="w-full sm:w-auto sm:min-w-[220px]">
+              <BookReviewDialog />
+            </div>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">No credit card. Takes 60 seconds.</p>
 
@@ -169,9 +170,14 @@ export default function Home() {
           <LineChart className="h-10 w-10 mx-auto text-primary mb-4" />
           <h2 className="font-heading text-3xl md:text-4xl font-bold">Your blueprint is one click away.</h2>
           <p className="mt-4 text-muted-foreground">Start fixing today and building tomorrow — for free.</p>
-          <Button asChild size="lg" className="mt-8">
-            <Link to="/app">Open the app <ArrowRight className="h-4 w-4" /></Link>
-          </Button>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg">
+              <Link to="/app">Open the app <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
+            <div className="w-full sm:w-auto sm:min-w-[240px]">
+              <BookReviewDialog />
+            </div>
+          </div>
         </div>
       </section>
 
