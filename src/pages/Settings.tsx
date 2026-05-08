@@ -109,11 +109,13 @@ function BankCard({ s, setS }: { s: IntegrationSettings; setS: (x: IntegrationSe
           </div>
         )}
 
-        <div className="border-t pt-3">
-          <Badge variant="outline" className="text-[10px]">Plaid-ready</Badge>
-          <p className="text-xs text-muted-foreground mt-1">
-            Future Plaid integration will hook into the same <code className="text-[10px] bg-muted px-1 rounded">addExpense</code> /
-            <code className="text-[10px] bg-muted px-1 rounded ml-1">addAccount</code> flow.
+        <div className="border-t pt-3 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant="outline" className="text-[10px]">Plaid-ready</Badge>
+            <Link to="/bank-accounts" className="text-xs font-semibold text-primary underline">Manage bank accounts →</Link>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Connect checking, savings, and credit cards. Synced transactions auto-categorize, update safe-to-spend, and refresh the 30-day cash flow.
           </p>
         </div>
       </CardContent>

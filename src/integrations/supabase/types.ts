@@ -56,6 +56,60 @@ export type Database = {
         }
         Relationships: []
       }
+      bank_accounts: {
+        Row: {
+          account_name: string
+          account_subtype: string | null
+          account_type: string
+          available_balance: number
+          created_at: string
+          current_balance: number
+          id: string
+          institution_name: string
+          is_active: boolean
+          last_synced_at: string | null
+          plaid_access_token: string | null
+          plaid_account_id: string | null
+          plaid_item_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          account_subtype?: string | null
+          account_type: string
+          available_balance?: number
+          created_at?: string
+          current_balance?: number
+          id?: string
+          institution_name: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          plaid_access_token?: string | null
+          plaid_account_id?: string | null
+          plaid_item_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_subtype?: string | null
+          account_type?: string
+          available_balance?: number
+          created_at?: string
+          current_balance?: number
+          id?: string
+          institution_name?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          plaid_access_token?: string | null
+          plaid_account_id?: string | null
+          plaid_item_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bills: {
         Row: {
           amount: number
@@ -275,6 +329,7 @@ export type Database = {
           current_saved: number
           goal_name: string
           id: string
+          linked_bank_account_id: string | null
           monthly_contribution: number
           target_amount: number
           target_date: string | null
@@ -286,6 +341,7 @@ export type Database = {
           current_saved?: number
           goal_name: string
           id?: string
+          linked_bank_account_id?: string | null
           monthly_contribution?: number
           target_amount?: number
           target_date?: string | null
@@ -297,49 +353,72 @@ export type Database = {
           current_saved?: number
           goal_name?: string
           id?: string
+          linked_bank_account_id?: string | null
           monthly_contribution?: number
           target_amount?: number
           target_date?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "savings_goals_linked_bank_account_id_fkey"
+            columns: ["linked_bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
           amount: number
+          bank_account_id: string | null
           category: string | null
           created_at: string
           date: string
           description: string | null
           id: string
           merchant: string | null
+          plaid_transaction_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
+          bank_account_id?: string | null
           category?: string | null
           created_at?: string
           date: string
           description?: string | null
           id?: string
           merchant?: string | null
+          plaid_transaction_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          bank_account_id?: string | null
           category?: string | null
           created_at?: string
           date?: string
           description?: string | null
           id?: string
           merchant?: string | null
+          plaid_transaction_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
