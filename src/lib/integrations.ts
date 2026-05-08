@@ -11,7 +11,12 @@ export type EventType =
   | "monthly.reset"
   | "blueprint.completed"
   | "appointment.requested"
-  | "lead.captured";
+  | "lead.captured"
+  | "subscription_detected"
+  | "subscription_marked_cancel"
+  | "cancellation_help_requested"
+  | "subscription_canceled"
+  | "invest_savings_projection_created";
 
 export interface IntegrationSettings {
   bankMode: "manual" | "csv" | "demo";
@@ -20,16 +25,25 @@ export interface IntegrationSettings {
   ghlEnabled: boolean;
   calendarEnabled: boolean;
   notificationEmail: string;
+  /** Optional contact info reused for cancellation help requests. */
+  userName?: string;
+  userPhone?: string;
+  preferredContact?: "email" | "phone" | "sms";
 }
 
 export const ALL_EVENTS: { id: EventType; label: string }[] = [
-  { id: "transaction.added",     label: "New transaction added" },
-  { id: "overdraft.warning",     label: "Overdraft warning triggered" },
-  { id: "leak.detected",         label: "Money leak detected" },
-  { id: "monthly.reset",         label: "Monthly reset completed" },
-  { id: "blueprint.completed",   label: "Future Blueprint completed" },
-  { id: "appointment.requested", label: "Appointment requested" },
-  { id: "lead.captured",         label: "GHL lead captured" },
+  { id: "transaction.added",              label: "New transaction added" },
+  { id: "overdraft.warning",              label: "Overdraft warning triggered" },
+  { id: "leak.detected",                  label: "Money leak detected" },
+  { id: "monthly.reset",                  label: "Monthly reset completed" },
+  { id: "blueprint.completed",            label: "Future Blueprint completed" },
+  { id: "appointment.requested",          label: "Appointment requested" },
+  { id: "lead.captured",                  label: "GHL lead captured" },
+  { id: "subscription_detected",          label: "Subscription detected" },
+  { id: "subscription_marked_cancel",     label: "Subscription marked to cancel" },
+  { id: "cancellation_help_requested",    label: "Cancellation help requested" },
+  { id: "subscription_canceled",          label: "Subscription canceled" },
+  { id: "invest_savings_projection_created", label: "Invest-the-savings projection created" },
 ];
 
 const DEFAULTS: IntegrationSettings = {
