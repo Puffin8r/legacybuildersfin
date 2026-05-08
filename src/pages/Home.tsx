@@ -4,6 +4,8 @@ import {
   Brain, LineChart, CheckCircle2, MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import BookReviewDialog from "@/components/BookReviewDialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const FEATURES = [
   { icon: Wallet, title: "Today's Money", desc: "See exactly what's safe to spend right now — no spreadsheets required." },
