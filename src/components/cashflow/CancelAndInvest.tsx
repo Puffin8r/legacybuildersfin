@@ -105,6 +105,26 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
     toast.success(`Added ${detectedFromExpenses.length} possible subscription${detectedFromExpenses.length === 1 ? "" : "s"}`);
   }
 
+  /** Pull Plaid recurring streams (demo until live) and merge into subs.
+   *  Real flow: server calls /transactions/recurring/get → POSTs streams here. */
+  async function syncFromBank() {
+    const accounts = loadBankAccounts().filter(a => a.is_active);
+    if (accounts.length === 0) {
+      toast.error("Connect a bank account first to sync recurring charges.");
+      return;
+    }
+    const streams = demoRecurringStreams();
+    const { next, result } = upsertFromPlaidRecurring(subs, streams);
+    setSubs(next);
+    const parts = [
+      result.added.length    && `${result.added.length} added`,
+      result.updated.length  && `${result.updated.length} price-changed`,
+      result.removed         && `${result.removed} canceled`,
+      result.unchanged       && `${result.unchanged} unchanged`,
+    ].filter(Boolean);
+    toast.success(`Synced from bank: ${parts.join(" · ") || "nothing new"}`);
+  }
+
   function handleCSV(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
