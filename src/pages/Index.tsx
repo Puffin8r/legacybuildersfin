@@ -93,6 +93,15 @@ export default function Index() {
         {tab === "fix"    && <FixMyMoney cf={cf} />}
         {tab === "future" && <FutureBlueprint />}
 
+        {/* Book a financial review */}
+        <section className="mt-6 rounded-2xl border bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+          <h3 className="text-sm font-semibold mb-1">Want a hand from a real human?</h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Book a free 30-minute financial review with our team.
+          </p>
+          <BookReviewDialog />
+        </section>
+
         {/* Cross-tab Coach jump prompts */}
         <section className="mt-6 rounded-2xl border bg-card p-4">
           <div className="flex items-center gap-2 mb-3">
