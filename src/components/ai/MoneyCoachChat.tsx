@@ -329,7 +329,21 @@ export default function MoneyCoachChat({
               <p className="text-[11px] text-muted-foreground">Focused on {TAB_LABEL[tab]}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
+          <div className="flex items-center gap-1">
+            {totalRecent > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowRecent(s => !s)}
+                aria-label="Recent prompts"
+                title="Recent prompts"
+                className={showRecent ? "text-primary" : ""}
+              >
+                <History className="h-4 w-4" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
+          </div>
         </div>
 
         <ScrollArea className="flex-1 px-4 py-3" ref={scrollRef as any}>
