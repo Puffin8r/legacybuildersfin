@@ -127,7 +127,10 @@ function PayoffOrderCard({
   return (
     <Card className={highlight ? "border-2 border-primary" : ""}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2"><Icon className="h-4 w-4"/>{title}</CardTitle>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Icon className="h-4 w-4"/>{title}
+          <InfoTip tip={title.toLowerCase() === "snowball" ? "snowball" : "avalanche"} />
+        </CardTitle>
         <p className="text-xs text-muted-foreground">{subtitle}</p>
       </CardHeader>
       <CardContent className="space-y-1.5">
