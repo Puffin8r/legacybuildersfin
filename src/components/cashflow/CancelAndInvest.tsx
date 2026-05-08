@@ -4,47 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Upload, Sparkles, TrendingUp, AlertTriangle, LineChart as LineChartIcon } from "lucide-react";
+import { Plus, Trash2, Upload, Sparkles, TrendingUp, AlertTriangle, LineChart as LineChartIcon, Banknote } from "lucide-react";
 import { formatMoney, EXPENSE_CATEGORIES, type ExpenseCategory } from "@/lib/cashflow-types";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { toast } from "sonner";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceDot } from "recharts";
+import {
+  loadSubscriptions, saveSubscriptions, upsertFromPlaidRecurring, demoRecurringStreams,
+  type Subscription, type SubscriptionUsage as Usage, type SubscriptionStatus as CancelStatus,
+} from "@/lib/subscription-service";
+import { loadAccounts as loadBankAccounts } from "@/lib/bank-service";
 
 /* ============================================================
    Cancel & Invest
-   - Subscription detector (manual + CSV + auto-detect from expenses)
+   - Subscription detector (manual + CSV + auto-detect from expenses + Plaid recurring sync)
    - Suggests cancellations ranked by usage, cost, duplicates, etc.
    - Shows what canceled $ would grow into at 9% annually
    ============================================================ */
 
-type Usage = "Use Often" | "Sometimes" | "Rarely" | "Never";
-type CancelStatus = "Keep" | "Maybe Cancel" | "Cancel Requested" | "Canceled";
-type Frequency = "monthly" | "yearly" | "weekly";
-
-interface Subscription {
-  id: string;
-  merchant: string;
-  monthly_amount: number;
-  frequency: Frequency;
-  last_charged: string;
-  category: ExpenseCategory;
-  usage: Usage;
-  status: CancelStatus;
-  source: "manual" | "csv" | "detected" | "plaid";
-  prev_amount?: number; // for "increasing price"
-}
-
-const KEY = "cashflow-subscriptions-v1";
 const RETURN_RATE = 0.09;
 const NON_ESSENTIAL: ExpenseCategory[] = ["Subscriptions", "Entertainment", "Shopping", "Food"];
-
-function load(): Subscription[] {
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-  catch { return []; }
-}
-function save(list: Subscription[]) {
-  localStorage.setItem(KEY, JSON.stringify(list));
-}
 
 /** Future-value of a monthly contribution at 9% APR for N years. */
 function futureValue(monthly: number, years: number, rate = RETURN_RATE): number {
@@ -79,8 +58,8 @@ function suggestionFor(s: Subscription, all: Subscription[]): string {
 }
 
 export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
-  const [subs, setSubs] = useState<Subscription[]>(load);
-  useEffect(() => save(subs), [subs]);
+  const [subs, setSubs] = useState<Subscription[]>(loadSubscriptions);
+  useEffect(() => saveSubscriptions(subs), [subs]);
 
   // ---- Auto-detect from expense history ----
   const detectedFromExpenses = useMemo(() => {
@@ -124,6 +103,26 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
     }
     setSubs(prev => [...prev, ...detectedFromExpenses]);
     toast.success(`Added ${detectedFromExpenses.length} possible subscription${detectedFromExpenses.length === 1 ? "" : "s"}`);
+  }
+
+  /** Pull Plaid recurring streams (demo until live) and merge into subs.
+   *  Real flow: server calls /transactions/recurring/get → POSTs streams here. */
+  async function syncFromBank() {
+    const accounts = loadBankAccounts().filter(a => a.is_active);
+    if (accounts.length === 0) {
+      toast.error("Connect a bank account first to sync recurring charges.");
+      return;
+    }
+    const streams = demoRecurringStreams();
+    const { next, result } = upsertFromPlaidRecurring(subs, streams);
+    setSubs(next);
+    const parts = [
+      result.added.length    && `${result.added.length} added`,
+      result.updated.length  && `${result.updated.length} price-changed`,
+      result.removed         && `${result.removed} canceled`,
+      result.unchanged       && `${result.unchanged} unchanged`,
+    ].filter(Boolean);
+    toast.success(`Synced from bank: ${parts.join(" · ") || "nothing new"}`);
   }
 
   function handleCSV(file: File) {
@@ -280,8 +279,11 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
 
       {/* Import actions */}
       <Card>
-        <CardContent className="p-3 grid grid-cols-2 gap-2">
-          <Button variant="outline" className="w-full" onClick={importDetected}>
+        <CardContent className="p-3 grid grid-cols-3 gap-2">
+          <Button variant="outline" className="w-full text-xs px-2" onClick={syncFromBank}>
+            <Banknote className="h-4 w-4 mr-1"/>Sync bank
+          </Button>
+          <Button variant="outline" className="w-full text-xs px-2" onClick={importDetected}>
             <Sparkles className="h-4 w-4 mr-1"/>Detect ({detectedFromExpenses.length})
           </Button>
           <label className="w-full">
@@ -289,12 +291,16 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
               type="file" accept=".csv" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) handleCSV(f); e.target.value = ""; }}
             />
-            <Button variant="outline" className="w-full" asChild>
-              <span><Upload className="h-4 w-4 mr-1"/>Upload CSV</span>
+            <Button variant="outline" className="w-full text-xs px-2" asChild>
+              <span><Upload className="h-4 w-4 mr-1"/>CSV</span>
             </Button>
           </label>
         </CardContent>
       </Card>
+
+      <p className="text-[11px] text-muted-foreground px-1">
+        Bank-detected subscriptions update automatically as Plaid finds new charges. Bank data may take several hours to refresh.
+      </p>
 
       <AddSubscription onAdd={s => setSubs(prev => [...prev, s])}/>
 
