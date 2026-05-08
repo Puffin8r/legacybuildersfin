@@ -123,6 +123,8 @@ export default function MoneyCoachChat({
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recent, setRecent] = useState<RecentMap>(() => loadRecent());
+  const [showRecent, setShowRecent] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Reset chat when switching tabs so context stays focused.
