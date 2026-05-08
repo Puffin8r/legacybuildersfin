@@ -15,6 +15,7 @@ import {
 } from "@/lib/integrations";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import type { Expense, ExpenseCategory } from "@/lib/cashflow-types";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Settings() {
   const [s, setS] = useState<IntegrationSettings>(() => loadSettings());
@@ -23,13 +24,16 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-background pb-12">
       <header className="sticky top-0 z-20 bg-card/90 backdrop-blur border-b">
-        <div className="px-4 py-4 max-w-2xl mx-auto flex items-center gap-3">
-          <Link to="/" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 -ml-2 rounded-md hover:bg-accent text-sm font-medium">
-            <ArrowLeft className="h-4 w-4" /> Home
-          </Link>
-          <div className="min-w-0">
-            <h1 className="text-base font-bold font-heading leading-tight">Settings & Integrations</h1>
-            <p className="text-xs text-muted-foreground">Connect your money to the tools you use.</p>
+        <div className="px-4 py-3 max-w-2xl mx-auto space-y-2">
+          <Breadcrumbs items={[{ label: "Settings" }]} />
+          <div className="flex items-center gap-3">
+            <Link to="/" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 -ml-2 rounded-md hover:bg-accent text-sm font-medium">
+              <ArrowLeft className="h-4 w-4" /> Home
+            </Link>
+            <div className="min-w-0">
+              <h1 className="text-base font-bold font-heading leading-tight">Settings & Integrations</h1>
+              <p className="text-xs text-muted-foreground">Connect your money to the tools you use.</p>
+            </div>
           </div>
         </div>
       </header>
