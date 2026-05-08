@@ -109,8 +109,8 @@ export default function FutureBlueprint() {
 
       {/* Key metrics */}
       <div className="grid grid-cols-2 gap-3">
-        <Metric icon={Target} label="FIN (your number)" value={formatCurrency(fin)} hint={`${formatCurrency(annualExpenses)}/yr ÷ 4%`}/>
-        <Metric icon={Clock} label="Years to double" value={ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`} hint="Rule of 72"/>
+        <Metric icon={Target} label="FIN (your number)" tipKey="fin" value={formatCurrency(fin)} hint={`${formatCurrency(annualExpenses)}/yr ÷ 4%`}/>
+        <Metric icon={Clock} label="Years to double" tipKey="ruleOf72" value={ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`} hint="Rule of 72"/>
         <Metric icon={Coins} label="Monthly income at retirement" value={formatCurrency(monthlyRetirementIncome)} hint="At 4% withdrawal"/>
         <Metric icon={TrendingUp} label="Projected at retirement" value={formatCurrency(projected)} hint={`In ${yearsToRetire} years`}/>
       </div>
