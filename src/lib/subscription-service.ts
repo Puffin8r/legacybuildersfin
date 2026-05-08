@@ -14,6 +14,17 @@ export type SubscriptionUsage  = "Use Often" | "Sometimes" | "Rarely" | "Never";
 export type SubscriptionStatus = "Keep" | "Maybe Cancel" | "Cancel Requested" | "Canceled";
 export type SubscriptionFreq   = "monthly" | "yearly" | "weekly";
 
+/** Granular cancellation lifecycle (separate from user-facing status). */
+export type CancellationProgress =
+  | "Not Started"
+  | "Instructions Viewed"
+  | "Help Requested"
+  | "In Progress"
+  | "Canceled"
+  | "Could Not Cancel";
+
+export type CancellationMethod = "manual" | "request" | "api";
+
 export interface Subscription {
   id: string;
   merchant: string;
@@ -27,6 +38,117 @@ export interface Subscription {
   prev_amount?: number;
   /** Plaid recurring stream id — used for stable upsert. */
   plaid_stream_id?: string;
+  cancellation_progress?: CancellationProgress;
+  cancellation_method?: CancellationMethod;
+  cancellation_updated_at?: string;
+}
+
+/* ---------------- Cancellation Requests ---------------- */
+
+export interface CancellationRequest {
+  id: string;
+  subscription_id: string;
+  merchant: string;
+  monthly_amount: number;
+  notes?: string;
+  authorized: boolean;
+  created_at: string;
+  status: "Open" | "In Progress" | "Closed";
+}
+
+const REQUESTS_KEY = "cashflow-cancel-requests-v1";
+
+export function loadCancellationRequests(): CancellationRequest[] {
+  try { return JSON.parse(localStorage.getItem(REQUESTS_KEY) || "[]"); }
+  catch { return []; }
+}
+export function saveCancellationRequests(list: CancellationRequest[]) {
+  localStorage.setItem(REQUESTS_KEY, JSON.stringify(list));
+}
+export function addCancellationRequest(r: Omit<CancellationRequest, "id" | "created_at" | "status">): CancellationRequest {
+  const full: CancellationRequest = {
+    ...r,
+    id: crypto.randomUUID(),
+    created_at: new Date().toISOString(),
+    status: "Open",
+  };
+  saveCancellationRequests([...loadCancellationRequests(), full]);
+  return full;
+}
+
+/* ---------------- Provider directory ---------------- */
+
+export interface CancelProvider {
+  /** Lowercased substring matched against merchant name. */
+  match: string[];
+  display: string;
+  /** Step-by-step manual cancel instructions. */
+  instructions: string[];
+  /** Direct deep link (account/billing page) when available. */
+  url?: string;
+  /** True only if we have a verified, automated cancellation flow. */
+  api_supported?: boolean;
+}
+
+export const CANCEL_PROVIDERS: CancelProvider[] = [
+  {
+    match: ["netflix"], display: "Netflix",
+    url: "https://www.netflix.com/cancelplan",
+    instructions: [
+      "Sign in at netflix.com on a browser.",
+      "Open Account → Membership & Billing.",
+      "Click 'Cancel Membership' and confirm.",
+    ],
+  },
+  {
+    match: ["spotify"], display: "Spotify",
+    url: "https://www.spotify.com/account/subscription/",
+    instructions: [
+      "Sign in at spotify.com.",
+      "Go to Account → Your Plan.",
+      "Choose 'Change Plan' → 'Cancel Premium'.",
+    ],
+  },
+  {
+    match: ["hulu"], display: "Hulu",
+    url: "https://secure.hulu.com/account",
+    instructions: [
+      "Sign in at hulu.com.",
+      "Open Account → Cancel Your Subscription.",
+      "Select a reason and confirm cancellation.",
+    ],
+  },
+  {
+    match: ["apple", "icloud", "itunes"], display: "Apple Subscriptions",
+    url: "https://apps.apple.com/account/subscriptions",
+    instructions: [
+      "On iPhone: Settings → [your name] → Subscriptions.",
+      "Tap the subscription, then 'Cancel Subscription'.",
+      "On Mac: App Store → your name → Account Settings → Subscriptions → Manage.",
+    ],
+  },
+  {
+    match: ["amazon prime", "amazon"], display: "Amazon Prime",
+    url: "https://www.amazon.com/gp/primecentral",
+    instructions: [
+      "Sign in at amazon.com.",
+      "Open Account & Lists → Prime Membership.",
+      "Click 'Update, cancel and more' → 'End membership'.",
+    ],
+  },
+  {
+    match: ["planet fitness", "gym"], display: "Gym Membership",
+    instructions: [
+      "Most gyms require in-person or certified-mail cancellation.",
+      "Check your contract for the cancellation address and notice period.",
+      "Send a written request and keep proof of delivery.",
+    ],
+  },
+];
+
+export function findProvider(merchant: string): CancelProvider | undefined {
+  const m = merchant.toLowerCase();
+  return CANCEL_PROVIDERS.find(p => p.match.some(k => m.includes(k)));
 }
 
 /** Mirrors the subset of Plaid's RecurringTransaction stream we use. */
