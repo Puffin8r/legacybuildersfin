@@ -22,7 +22,7 @@ const TAB_LABEL: Record<CoachTab, string> = {
   future: "Future Blueprint",
 };
 
-const SUGGESTED: Record<CoachTab, string[]> = {
+export const SUGGESTED: Record<CoachTab, string[]> = {
   today: [
     "Will I run out of money before my next paycheck?",
     "What's safe for me to spend right now?",
@@ -96,13 +96,15 @@ function pickFollowUps(reply: string, tab: CoachTab, asked: Set<string>): string
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
 export default function MoneyCoachChat({
-  cf, tab, open: openProp, onOpenChange, hideFab,
+  cf, tab, open: openProp, onOpenChange, hideFab, initialPrompt, onPromptConsumed,
 }: {
   cf: CashFlow;
   tab: CoachTab;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   hideFab?: boolean;
+  initialPrompt?: string | null;
+  onPromptConsumed?: () => void;
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = openProp ?? internalOpen;
@@ -232,6 +234,15 @@ export default function MoneyCoachChat({
   };
 
   const tabSuggestions = SUGGESTED[tab];
+
+  // If parent opened the chat with a starter prompt, send it once.
+  useEffect(() => {
+    if (open && initialPrompt && !loading && messages.length === 0) {
+      send(initialPrompt);
+      onPromptConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialPrompt]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

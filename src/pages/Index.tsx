@@ -6,7 +6,7 @@ import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
 import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
-import MoneyCoachChat, { type CoachTab } from "@/components/ai/MoneyCoachChat";
+import MoneyCoachChat, { type CoachTab, SUGGESTED } from "@/components/ai/MoneyCoachChat";
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
 import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,14 @@ export default function Index() {
   const [coachOpen, setCoachOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [coachPrompt, setCoachPrompt] = useState<string | null>(null);
   const cf = useCashFlow();
+
+  const askCoach = (prompt: string, focus?: Tab) => {
+    if (focus && focus !== tab) setTab(focus);
+    setCoachPrompt(prompt);
+    setCoachOpen(true);
+  };
   const meta = TITLES[tab];
 
   useEffect(() => {
@@ -70,9 +77,39 @@ export default function Index() {
         {tab === "where"  && <WhereItWent cf={cf} />}
         {tab === "fix"    && <FixMyMoney cf={cf} />}
         {tab === "future" && <FutureBlueprint />}
+
+        {/* Cross-tab Coach jump prompts */}
+        <section className="mt-6 rounded-2xl border bg-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">Ask the Coach</h3>
+          </div>
+          <div className="space-y-3">
+            <PromptGroup
+              label="Fix my money"
+              accent="text-secondary"
+              prompts={SUGGESTED.fix.slice(0, 3)}
+              onPick={(p) => askCoach(p, "fix")}
+            />
+            <PromptGroup
+              label="Future plan"
+              accent="text-primary"
+              prompts={SUGGESTED.future.slice(0, 3)}
+              onPick={(p) => askCoach(p, "future")}
+            />
+          </div>
+        </section>
       </main>
 
-      <MoneyCoachChat cf={cf} tab={tab} open={coachOpen} onOpenChange={setCoachOpen} hideFab />
+      <MoneyCoachChat
+        cf={cf}
+        tab={tab}
+        open={coachOpen}
+        onOpenChange={(o) => { setCoachOpen(o); if (!o) setCoachPrompt(null); }}
+        hideFab
+        initialPrompt={coachPrompt}
+        onPromptConsumed={() => setCoachPrompt(null)}
+      />
 
       <OnboardingDialog
         open={showOnboarding}
@@ -124,6 +161,27 @@ export default function Index() {
           </button>
         </div>
       </nav>
+    </div>
+  );
+}
+
+function PromptGroup({
+  label, accent, prompts, onPick,
+}: { label: string; accent: string; prompts: string[]; onPick: (p: string) => void }) {
+  return (
+    <div>
+      <p className={cn("text-[11px] font-semibold uppercase tracking-wide mb-1.5", accent)}>{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {prompts.map(p => (
+          <button
+            key={p}
+            onClick={() => onPick(p)}
+            className="text-xs rounded-full border bg-background hover:bg-accent px-3 py-1.5 text-left transition-colors"
+          >
+            {p}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
