@@ -358,6 +358,7 @@ function SubCard({
   onRemove: () => void;
   onInvestInstead: () => void;
 }) {
+  const [cancelOpen, setCancelOpen] = useState(false);
   const yearly = sub.monthly_amount * 12;
   const isCanceled = sub.status === "Canceled" || sub.status === "Cancel Requested";
 
@@ -409,14 +410,23 @@ function SubCard({
         </div>
       </div>
 
+      {sub.cancellation_progress && sub.cancellation_progress !== "Not Started" && (
+        <p className="text-[11px] text-muted-foreground">
+          Cancellation: <span className="font-medium">{sub.cancellation_progress}</span>
+          {sub.cancellation_method && <> · via {sub.cancellation_method}</>}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-2 pt-1">
         <Button size="sm" variant={sub.status === "Keep" ? "secondary" : "outline"} onClick={() => onUpdate({ status: "Keep" })}>Keep</Button>
         <Button size="sm" variant={sub.status === "Maybe Cancel" ? "secondary" : "outline"} onClick={() => onUpdate({ status: "Maybe Cancel" })}>Maybe</Button>
-        <Button size="sm" variant={sub.status === "Cancel Requested" ? "destructive" : "outline"} onClick={() => onUpdate({ status: "Cancel Requested" })}>Cancel</Button>
+        <Button size="sm" variant={isCanceled ? "destructive" : "outline"} onClick={() => setCancelOpen(true)}>Cancel…</Button>
         <Button size="sm" variant="default" onClick={onInvestInstead}>
           <TrendingUp className="h-3 w-3 mr-1"/>Invest instead
         </Button>
       </div>
+
+      <CancelDialog sub={sub} open={cancelOpen} onOpenChange={setCancelOpen} onUpdate={onUpdate}/>
     </div>
   );
 }
