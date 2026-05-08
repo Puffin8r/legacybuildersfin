@@ -77,9 +77,39 @@ export default function Index() {
         {tab === "where"  && <WhereItWent cf={cf} />}
         {tab === "fix"    && <FixMyMoney cf={cf} />}
         {tab === "future" && <FutureBlueprint />}
+
+        {/* Cross-tab Coach jump prompts */}
+        <section className="mt-6 rounded-2xl border bg-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">Ask the Coach</h3>
+          </div>
+          <div className="space-y-3">
+            <PromptGroup
+              label="Fix my money"
+              accent="text-secondary"
+              prompts={SUGGESTED.fix.slice(0, 3)}
+              onPick={(p) => askCoach(p, "fix")}
+            />
+            <PromptGroup
+              label="Future plan"
+              accent="text-primary"
+              prompts={SUGGESTED.future.slice(0, 3)}
+              onPick={(p) => askCoach(p, "future")}
+            />
+          </div>
+        </section>
       </main>
 
-      <MoneyCoachChat cf={cf} tab={tab} open={coachOpen} onOpenChange={setCoachOpen} hideFab />
+      <MoneyCoachChat
+        cf={cf}
+        tab={tab}
+        open={coachOpen}
+        onOpenChange={(o) => { setCoachOpen(o); if (!o) setCoachPrompt(null); }}
+        hideFab
+        initialPrompt={coachPrompt}
+        onPromptConsumed={() => setCoachPrompt(null)}
+      />
 
       <OnboardingDialog
         open={showOnboarding}
