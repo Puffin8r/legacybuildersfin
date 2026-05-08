@@ -363,6 +363,14 @@ export default function MoneyCoachChat({
                     </button>
                   ))}
                 </div>
+                {totalRecent > 0 && (
+                  <div className="pt-3 mt-1 border-t">
+                    <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+                      <History className="h-3.5 w-3.5 text-muted-foreground" /> Recent prompts
+                    </p>
+                    <RecentList />
+                  </div>
+                )}
               </div>
             )}
             {messages.map((m, i) => {
