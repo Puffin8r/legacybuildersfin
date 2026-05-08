@@ -14,6 +14,7 @@ export default function BookReviewDialog() {
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   return (
+    <div className="w-full space-y-2">
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="lg" className="w-full">
