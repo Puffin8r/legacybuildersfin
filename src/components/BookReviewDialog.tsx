@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarCheck, ExternalLink } from "lucide-react";
 
 // Replace with your real Calendly event URL when ready.
-const CALENDLY_URL = "https://calendly.com/your-team/financial-review";
+const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
 
 export default function BookReviewDialog() {
   const [open, setOpen] = useState(false);
