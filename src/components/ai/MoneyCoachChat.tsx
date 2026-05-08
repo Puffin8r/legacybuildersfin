@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Sparkles, Send, X } from "lucide-react";
+import { Sparkles, Send, X, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -95,6 +95,17 @@ function pickFollowUps(reply: string, tab: CoachTab, asked: Set<string>): string
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/money-coach-chat`;
 
+// Per-topic recent prompts saved across sessions.
+const RECENT_KEY = "coach-recent-prompts-v1";
+type RecentMap = Partial<Record<CoachTab, string[]>>;
+function loadRecent(): RecentMap {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "{}"); } catch { return {}; }
+}
+function saveRecent(m: RecentMap) {
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(m)); } catch { /* ignore */ }
+}
+
 export default function MoneyCoachChat({
   cf, tab, open: openProp, onOpenChange, hideFab, initialPrompt, onPromptConsumed,
 }: {
@@ -112,6 +123,8 @@ export default function MoneyCoachChat({
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recent, setRecent] = useState<RecentMap>(() => loadRecent());
+  const [showRecent, setShowRecent] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Reset chat when switching tabs so context stays focused.
@@ -159,6 +172,15 @@ export default function MoneyCoachChat({
     setLoading(true);
 
     const focus = pickTopic(text);
+
+    // Save under whichever topic this prompt belongs to (focus wins).
+    setRecent(prev => {
+      const list = [text, ...(prev[focus] ?? []).filter(p => p !== text)].slice(0, 5);
+      const next = { ...prev, [focus]: list };
+      saveRecent(next);
+      return next;
+    });
+
     const totalCash = cf.accounts.reduce((s, a) => s + a.balance, 0);
 
     const context = {
@@ -235,6 +257,44 @@ export default function MoneyCoachChat({
 
   const tabSuggestions = SUGGESTED[tab];
 
+  const recentFix = recent.fix ?? [];
+  const recentFuture = recent.future ?? [];
+  const totalRecent = recentFix.length + recentFuture.length;
+
+  const RecentList = ({ compact }: { compact?: boolean }) => {
+    if (totalRecent === 0) return null;
+    return (
+      <div className={compact ? "space-y-2" : "space-y-3"}>
+        {recentFix.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-secondary mb-1.5">Fix my money — recent</p>
+            <div className="flex flex-wrap gap-1.5">
+              {recentFix.map(p => (
+                <button key={"f-" + p} onClick={() => send(p)}
+                  className="text-xs rounded-full border bg-background hover:bg-accent px-3 py-1.5 text-left transition-colors">
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {recentFuture.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-primary mb-1.5">Future plan — recent</p>
+            <div className="flex flex-wrap gap-1.5">
+              {recentFuture.map(p => (
+                <button key={"u-" + p} onClick={() => send(p)}
+                  className="text-xs rounded-full border bg-background hover:bg-accent px-3 py-1.5 text-left transition-colors">
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // If parent opened the chat with a starter prompt, send it once.
   useEffect(() => {
     if (open && initialPrompt && !loading && messages.length === 0) {
@@ -269,7 +329,21 @@ export default function MoneyCoachChat({
               <p className="text-[11px] text-muted-foreground">Focused on {TAB_LABEL[tab]}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
+          <div className="flex items-center gap-1">
+            {totalRecent > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowRecent(s => !s)}
+                aria-label="Recent prompts"
+                title="Recent prompts"
+                className={showRecent ? "text-primary" : ""}
+              >
+                <History className="h-4 w-4" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
+          </div>
         </div>
 
         <ScrollArea className="flex-1 px-4 py-3" ref={scrollRef as any}>
@@ -289,6 +363,14 @@ export default function MoneyCoachChat({
                     </button>
                   ))}
                 </div>
+                {totalRecent > 0 && (
+                  <div className="pt-3 mt-1 border-t">
+                    <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+                      <History className="h-3.5 w-3.5 text-muted-foreground" /> Recent prompts
+                    </p>
+                    <RecentList />
+                  </div>
+                )}
               </div>
             )}
             {messages.map((m, i) => {
@@ -326,6 +408,20 @@ export default function MoneyCoachChat({
         </ScrollArea>
 
         <div className="border-t p-3 space-y-2">
+          {showRecent && totalRecent > 0 && messages.length > 0 && (
+            <div className="rounded-lg border bg-muted/40 p-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold flex items-center gap-1.5">
+                  <History className="h-3.5 w-3.5 text-muted-foreground" /> Recent prompts
+                </p>
+                <button
+                  onClick={() => { setRecent({}); saveRecent({}); setShowRecent(false); }}
+                  className="text-[10px] text-muted-foreground hover:text-foreground"
+                >Clear</button>
+              </div>
+              <RecentList compact />
+            </div>
+          )}
           <form onSubmit={e => { e.preventDefault(); send(input); }} className="flex gap-2">
             <Input
               value={input}
