@@ -222,25 +222,58 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
         </CardContent>
       </Card>
 
-      {/* Summary card */}
+      {/* Summary + chart */}
       {monthlySaved > 0 && (
         <Card className="border-success/30 bg-success/5">
-          <CardContent className="p-4 space-y-3">
-            <div>
-              <p className="text-xs uppercase text-muted-foreground tracking-wide">Potential monthly savings</p>
-              <p className="text-3xl font-bold font-heading text-success">{formatMoney(monthlySaved)}/mo</p>
-              <p className="text-sm text-muted-foreground">{formatMoney(yearlySaved)}/yr freed up</p>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <LineChartIcon className="h-4 w-4 text-success"/>What Canceling Could Build
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <StatTile label="Monthly savings" value={formatMoney(monthlySaved)} accent/>
+              <StatTile label="Yearly savings"  value={formatMoney(yearlySaved)} accent/>
+              <StatTile label="10-yr invested"  value={formatMoney(fv10)}/>
+              <StatTile label="30-yr invested"  value={formatMoney(fv30)}/>
             </div>
-            <div className="rounded-md bg-background/60 border p-3">
-              <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                <TrendingUp className="h-3 w-3"/>Invested at 9% annually:
-              </p>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <FvCell label="10 yrs" value={fv10}/>
-                <FvCell label="20 yrs" value={fv20}/>
-                <FvCell label="30 yrs" value={fv30}/>
-              </div>
+
+            <div className="h-44 -mx-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="fvFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.45}/>
+                      <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false}/>
+                  <XAxis dataKey="year" tick={{ fontSize: 10 }} tickFormatter={v => `${v}y`}/>
+                  <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={40}/>
+                  <Tooltip
+                    formatter={(v: number) => formatMoney(v)}
+                    labelFormatter={l => `Year ${l}`}
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="hsl(var(--success))" strokeWidth={2} fill="url(#fvFill)" isAnimationActive={false}/>
+                  <ReferenceDot x={5}  y={fv5}  r={3} fill="hsl(var(--primary))" stroke="none"/>
+                  <ReferenceDot x={10} y={fv10} r={3} fill="hsl(var(--primary))" stroke="none"/>
+                  <ReferenceDot x={20} y={fv20} r={3} fill="hsl(var(--primary))" stroke="none"/>
+                  <ReferenceDot x={30} y={fv30} r={3} fill="hsl(var(--primary))" stroke="none"/>
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
+
+            <div className="grid grid-cols-4 gap-1 text-center">
+              <FvCell label="5 yrs"  value={fv5}/>
+              <FvCell label="10 yrs" value={fv10}/>
+              <FvCell label="20 yrs" value={fv20}/>
+              <FvCell label="30 yrs" value={fv30}/>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground text-center">
+              Projected at 9% annual return, compounded monthly. For illustration only.
+            </p>
           </CardContent>
         </Card>
       )}
