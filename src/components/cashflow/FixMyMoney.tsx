@@ -39,9 +39,10 @@ export default function FixMyMoney({ cf }: { cf: CashFlow }) {
       </Card>
 
       <Tabs defaultValue="debt" className="w-full">
-        <TabsList className="w-full grid grid-cols-5 h-auto">
+        <TabsList className="w-full grid grid-cols-3 sm:grid-cols-6 h-auto">
           <TabsTrigger value="debt" className="text-xs px-1 py-2">Debt</TabsTrigger>
           <TabsTrigger value="save" className="text-xs px-1 py-2">Save</TabsTrigger>
+          <TabsTrigger value="cancel" className="text-xs px-1 py-2">Cancel</TabsTrigger>
           <TabsTrigger value="week" className="text-xs px-1 py-2">Week</TabsTrigger>
           <TabsTrigger value="reset" className="text-xs px-1 py-2">Reset</TabsTrigger>
           <TabsTrigger value="next" className="text-xs px-1 py-2">Next</TabsTrigger>
@@ -49,6 +50,7 @@ export default function FixMyMoney({ cf }: { cf: CashFlow }) {
 
         <TabsContent value="debt" className="space-y-3 mt-3"><DebtFreedomMap cf={cf}/></TabsContent>
         <TabsContent value="save" className="space-y-3 mt-3"><SavingsBuilder cf={cf}/></TabsContent>
+        <TabsContent value="cancel" className="space-y-3 mt-3"><CancelAndInvest cf={cf}/></TabsContent>
         <TabsContent value="week" className="space-y-3 mt-3"><WeeklyCheckIn cf={cf}/></TabsContent>
         <TabsContent value="reset" className="space-y-3 mt-3"><MonthlyReset cf={cf}/></TabsContent>
         <TabsContent value="next" className="space-y-3 mt-3"><NextMonthStrategy cf={cf}/></TabsContent>
