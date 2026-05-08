@@ -61,9 +61,9 @@ export default function Home() {
             <Button asChild size="lg">
               <Link to="/app">Get started free <ArrowRight className="h-4 w-4" /></Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <a href="#features">See features</a>
-            </Button>
+            <div className="w-full sm:w-auto sm:min-w-[220px]">
+              <BookReviewDialog />
+            </div>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">No credit card. Takes 60 seconds.</p>
 
