@@ -343,6 +343,14 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
         </CardContent>
       </Card>
 
+      {/* AI Money Coach Insights */}
+      <CoachInsightsCard
+        insights={useMemo(
+          () => buildCoachInsights({ subs, cancelable, monthlySaved, fv30 }),
+          [subs, cancelable, monthlySaved, fv30],
+        )}
+      />
+
       {/* Summary + chart */}
       {monthlySaved > 0 && (
         <Card className="border-success/30 bg-success/5">
