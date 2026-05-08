@@ -21,6 +21,7 @@ import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 import { toast } from "sonner";
 import { InfoTip } from "@/components/ui/info-tip";
+import CancelAndInvest from "./CancelAndInvest";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
   const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
