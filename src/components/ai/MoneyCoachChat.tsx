@@ -235,6 +235,15 @@ export default function MoneyCoachChat({
 
   const tabSuggestions = SUGGESTED[tab];
 
+  // If parent opened the chat with a starter prompt, send it once.
+  useEffect(() => {
+    if (open && initialPrompt && !loading && messages.length === 0) {
+      send(initialPrompt);
+      onPromptConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialPrompt]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {!hideFab && (
