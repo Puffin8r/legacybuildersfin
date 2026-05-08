@@ -10,7 +10,9 @@ import {
 import { PiggyBank, Target, Sparkles, TrendingUp } from "lucide-react";
 import { formatCurrency, calcProjectionData } from "@/lib/financial-calculations";
 
-const ROTH_LIMIT_2025 = 7000; // under 50
+// 2025 IRS Roth IRA contribution limits
+const ROTH_LIMIT_UNDER_50 = 7000;
+const ROTH_LIMIT_50_PLUS = 8000; // includes $1,000 catch-up
 
 interface Inputs {
   currentAge: number;
@@ -100,12 +102,17 @@ export default function RetirementIncomePlanner() {
     return { age, value: projection[idx]?.value ?? 0 };
   });
 
-  // Roth IRA helper
-  const recommendedRothMonthly = Math.round(ROTH_LIMIT_2025 / 12);
-  const currentRothAnnual = deferred.currentRothMonthly * 12;
-  const remainingRothAnnual = Math.max(ROTH_LIMIT_2025 - currentRothAnnual, 0);
-  const remainingRothMonthly = Math.round(remainingRothAnnual / 12);
-  const isMaxingRoth = currentRothAnnual >= ROTH_LIMIT_2025;
+  // Roth IRA helper — limit depends on age
+  const rothLimit = deferred.currentAge >= 50 ? ROTH_LIMIT_50_PLUS : ROTH_LIMIT_UNDER_50;
+  const recommendedRothMonthly = Math.round(rothLimit / 12);
+  const currentRothAnnual = Math.max(deferred.currentRothMonthly, 0) * 12;
+  const cappedRothAnnual = Math.min(currentRothAnnual, rothLimit);
+  const rothPct = rothLimit > 0 ? Math.min(100, (cappedRothAnnual / rothLimit) * 100) : 0;
+  const remainingRothAnnual = Math.max(rothLimit - currentRothAnnual, 0);
+  const remainingRothMonthly = Math.max(0, Math.round((remainingRothAnnual / 12) * 100) / 100);
+  const overageAnnual = Math.max(currentRothAnnual - rothLimit, 0);
+  const isMaxingRoth = currentRothAnnual >= rothLimit && currentRothAnnual <= rothLimit + 1;
+  const isOverContributing = currentRothAnnual > rothLimit;
 
   // Insights
   const yearsAtBoosted = yearsToTarget(requiredPortfolio, deferred.currentSavings, whatIf + 150, deferred.expectedReturn);
@@ -276,32 +283,45 @@ export default function RetirementIncomePlanner() {
       <Card className="border-accent/40">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2"><PiggyBank className="h-4 w-4 text-accent"/>Roth IRA helper</CardTitle>
-          <p className="text-xs text-muted-foreground">2025 yearly contribution limit (under 50): {formatCurrency(ROTH_LIMIT_2025)}</p>
+          <p className="text-xs text-muted-foreground">
+            2025 yearly limit ({deferred.currentAge >= 50 ? "age 50+" : "under 50"}): {formatCurrency(rothLimit)}
+            {deferred.currentAge >= 50 && <span className="ml-1">(includes $1,000 catch-up)</span>}
+          </p>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Your Roth contribution" value={inputs.currentRothMonthly} onChange={v => set("currentRothMonthly", v)} prefix="$" suffix="/mo" />
             <div className="rounded-lg border bg-card p-3">
-              <p className="text-xs text-muted-foreground">Recommended</p>
+              <p className="text-xs text-muted-foreground">Recommended (max)</p>
               <p className="text-base font-bold font-heading">{formatCurrency(recommendedRothMonthly)}/mo</p>
             </div>
           </div>
+          <Progress value={rothPct} className="h-2" />
           <div className="rounded-lg bg-background/70 border p-3 text-sm space-y-1">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Currently contributing</span>
-              <span className="font-semibold">{formatCurrency(deferred.currentRothMonthly)}/mo</span>
+              <span className="font-semibold">{formatCurrency(deferred.currentRothMonthly)}/mo ({formatCurrency(currentRothAnnual)}/yr)</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Status</span>
-              <span className={`font-semibold ${isMaxingRoth ? "text-success" : "text-accent"}`}>
-                {isMaxingRoth ? "Maxing it out 🎉" : "Room available"}
+              <span className={`font-semibold ${isOverContributing ? "text-destructive" : isMaxingRoth ? "text-success" : "text-accent"}`}>
+                {isOverContributing
+                  ? `Over by ${formatCurrency(overageAnnual)}/yr`
+                  : isMaxingRoth
+                    ? "Maxing it out 🎉"
+                    : `${rothPct.toFixed(0)}% of limit`}
               </span>
             </div>
-            {!isMaxingRoth && (
+            {!isMaxingRoth && !isOverContributing && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Additional room</span>
-                <span className="font-semibold">{formatCurrency(remainingRothMonthly)}/mo</span>
+                <span className="font-semibold">{formatCurrency(remainingRothMonthly)}/mo ({formatCurrency(remainingRothAnnual)}/yr)</span>
               </div>
+            )}
+            {isOverContributing && (
+              <p className="text-xs text-destructive pt-1">
+                You're contributing over the IRS limit — excess contributions may incur a 6% penalty per year until withdrawn.
+              </p>
             )}
           </div>
         </CardContent>
