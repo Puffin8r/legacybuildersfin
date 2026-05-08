@@ -22,7 +22,7 @@ const TAB_LABEL: Record<CoachTab, string> = {
   future: "Future Blueprint",
 };
 
-const SUGGESTED: Record<CoachTab, string[]> = {
+export const SUGGESTED: Record<CoachTab, string[]> = {
   today: [
     "Will I run out of money before my next paycheck?",
     "What's safe for me to spend right now?",
