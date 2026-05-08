@@ -15,6 +15,7 @@ import {
 } from "@/lib/subscription-service";
 import { loadAccounts as loadBankAccounts } from "@/lib/bank-service";
 import CancelDialog from "./CancelDialog";
+import { fireEvent } from "@/lib/integrations";
 
 /* ============================================================
    Cancel & Invest
@@ -104,6 +105,10 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
     }
     setSubs(prev => [...prev, ...detectedFromExpenses]);
     toast.success(`Added ${detectedFromExpenses.length} possible subscription${detectedFromExpenses.length === 1 ? "" : "s"}`);
+    detectedFromExpenses.forEach(s => fireEvent("subscription_detected", {
+      source: "expense_history",
+      merchant: s.merchant, monthly_amount: s.monthly_amount, category: s.category, last_charged: s.last_charged,
+    }));
   }
 
   /** Pull Plaid recurring streams (demo until live) and merge into subs.
@@ -124,6 +129,11 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
       result.unchanged       && `${result.unchanged} unchanged`,
     ].filter(Boolean);
     toast.success(`Synced from bank: ${parts.join(" · ") || "nothing new"}`);
+    result.added.forEach(s => fireEvent("subscription_detected", {
+      source: "plaid_recurring",
+      merchant: s.merchant, monthly_amount: s.monthly_amount, category: s.category,
+      plaid_stream_id: s.plaid_stream_id, last_charged: s.last_charged,
+    }));
   }
 
   function handleCSV(file: File) {
@@ -195,7 +205,21 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
   }, [monthlySaved]);
 
   function update(id: string, patch: Partial<Subscription>) {
-    setSubs(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+    setSubs(prev => prev.map(s => {
+      if (s.id !== id) return s;
+      const next = { ...s, ...patch };
+      // Fire status-change events for n8n
+      if (patch.status && patch.status !== s.status) {
+        const base = { id: next.id, merchant: next.merchant, monthly_amount: next.monthly_amount, category: next.category };
+        if (patch.status === "Maybe Cancel" || patch.status === "Cancel Requested") {
+          fireEvent("subscription_marked_cancel", { ...base, status: patch.status });
+        }
+        if (patch.status === "Canceled") {
+          fireEvent("subscription_canceled", { ...base, method: next.cancellation_method ?? "manual" });
+        }
+      }
+      return next;
+    }));
   }
   function remove(id: string) {
     setSubs(prev => prev.filter(s => s.id !== id));
@@ -205,7 +229,33 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
     update(s.id, { status: "Cancel Requested" });
     const fv = futureValue(s.monthly_amount, 30);
     toast.success(`If invested at 9%, ${formatMoney(s.monthly_amount)}/mo grows to ${formatMoney(fv)} in 30 years.`);
+    fireEvent("invest_savings_projection_created", {
+      source: "single_subscription",
+      merchant: s.merchant,
+      monthly_amount: s.monthly_amount,
+      projection_30yr: Math.round(fv),
+      rate: RETURN_RATE,
+    });
   }
+
+  // Fire a debounced "projection updated" event when total cancelable savings change.
+  useEffect(() => {
+    if (monthlySaved <= 0) return;
+    const t = setTimeout(() => {
+      fireEvent("invest_savings_projection_created", {
+        source: "summary",
+        monthly_savings: +monthlySaved.toFixed(2),
+        yearly_savings: +(monthlySaved * 12).toFixed(2),
+        fv_5yr:  Math.round(fv5),
+        fv_10yr: Math.round(fv10),
+        fv_20yr: Math.round(fv20),
+        fv_30yr: Math.round(fv30),
+        rate: RETURN_RATE,
+        canceled_count: cancelable.length,
+      });
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [monthlySaved, fv5, fv10, fv20, fv30, cancelable.length]);
 
   return (
     <div className="space-y-3">

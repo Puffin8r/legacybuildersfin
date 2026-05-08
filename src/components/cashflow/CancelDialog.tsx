@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, ExternalLink, FileText, Mail, Zap, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +14,7 @@ import {
   findProvider, addCancellationRequest,
 } from "@/lib/subscription-service";
 import { formatMoney } from "@/lib/cashflow-types";
+import { fireEvent, loadSettings, saveSettings } from "@/lib/integrations";
 
 interface Props {
   sub: Subscription;
@@ -27,6 +30,22 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
   const [confirm, setConfirm] = useState(false);
   const [authorize, setAuthorize] = useState(false);
   const [notes, setNotes] = useState("");
+
+  // Contact info for cancellation_help_requested payload (persisted to settings)
+  const settings = loadSettings();
+  const [name, setName]   = useState(settings.userName ?? "");
+  const [email, setEmail] = useState(settings.notificationEmail ?? "");
+  const [phone, setPhone] = useState(settings.userPhone ?? "");
+  const [pref, setPref]   = useState<"email" | "phone" | "sms">(settings.preferredContact ?? "email");
+
+  useEffect(() => {
+    if (!open) return;
+    const s = loadSettings();
+    setName(s.userName ?? "");
+    setEmail(s.notificationEmail ?? "");
+    setPhone(s.userPhone ?? "");
+    setPref(s.preferredContact ?? "email");
+  }, [open]);
 
   function reset() {
     setConfirm(false); setAuthorize(false); setNotes(""); setTab("manual");
@@ -50,6 +69,10 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
   function submitManual() {
     if (!confirm) { toast.error("Please confirm before continuing."); return; }
     setProgress("Canceled", "manual", "Canceled");
+    fireEvent("subscription_canceled", {
+      id: sub.id, merchant: sub.merchant, monthly_amount: sub.monthly_amount,
+      method: "manual", canceled_at: new Date().toISOString(),
+    });
     toast.success(`${sub.merchant} marked as canceled.`);
     close();
   }
@@ -63,7 +86,14 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
   function submitRequest() {
     if (!confirm)   { toast.error("Please confirm cancellation."); return; }
     if (!authorize) { toast.error("Please authorize CashFlow Blueprint to help."); return; }
-    addCancellationRequest({
+    if (!name.trim() || (pref === "email" && !email.trim()) || (pref !== "email" && !phone.trim())) {
+      toast.error("Please fill in your name and preferred contact info.");
+      return;
+    }
+    // Persist contact info for next time
+    saveSettings({ ...loadSettings(), userName: name, notificationEmail: email, userPhone: phone, preferredContact: pref });
+
+    const req = addCancellationRequest({
       subscription_id: sub.id,
       merchant: sub.merchant,
       monthly_amount: sub.monthly_amount,
@@ -71,6 +101,19 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
       authorized: true,
     });
     setProgress("Help Requested", "request", "Cancel Requested");
+
+    fireEvent("cancellation_help_requested", {
+      request_id: req.id,
+      user: { name, email, phone, preferred_contact: pref },
+      subscription: {
+        id: sub.id, merchant: sub.merchant,
+        monthly_amount: sub.monthly_amount,
+        last_charged: sub.last_charged, category: sub.category,
+      },
+      notes: notes.slice(0, 500),
+      requested_at: req.created_at,
+    });
+
     toast.success("Cancellation help requested. Our team will follow up.");
     close();
   }
@@ -78,8 +121,11 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
   function submitApi() {
     if (!apiAvailable) return;
     if (!confirm || !authorize) { toast.error("Please confirm and authorize."); return; }
-    // Real API cancellation would call an edge function here.
     setProgress("In Progress", "api", "Cancel Requested");
+    fireEvent("subscription_canceled", {
+      id: sub.id, merchant: sub.merchant, monthly_amount: sub.monthly_amount,
+      method: "api", initiated_at: new Date().toISOString(),
+    });
     toast.success("Cancellation initiated via provider API.");
     close();
   }
@@ -146,8 +192,34 @@ export default function CancelDialog({ sub, open, onOpenChange, onUpdate }: Prop
               We'll create a cancellation task for our support team. They will reach out with next steps.
               No payment details are shared.
             </p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Your name</Label>
+                <Input value={name} onChange={e => setName(e.target.value.slice(0, 80))} maxLength={80} className="h-8"/>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Preferred contact</Label>
+                <select
+                  value={pref}
+                  onChange={e => setPref(e.target.value as "email" | "phone" | "sms")}
+                  className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
+                >
+                  <option value="email">Email</option>
+                  <option value="phone">Phone call</option>
+                  <option value="sms">Text (SMS)</option>
+                </select>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Email</Label>
+                <Input type="email" value={email} onChange={e => setEmail(e.target.value.slice(0, 120))} maxLength={120} className="h-8"/>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Phone</Label>
+                <Input type="tel" value={phone} onChange={e => setPhone(e.target.value.slice(0, 30))} maxLength={30} className="h-8"/>
+              </div>
+            </div>
             <Textarea
-              placeholder="Optional: account email, last-4 of card, or anything that helps us cancel."
+              placeholder="Optional notes (account email, last-4 of card, anything that helps us cancel)."
               value={notes}
               onChange={e => setNotes(e.target.value.slice(0, 500))}
               maxLength={500}
