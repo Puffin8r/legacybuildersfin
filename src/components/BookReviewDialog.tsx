@@ -57,7 +57,13 @@ export default function BookReviewDialog() {
       </DialogContent>
     </Dialog>
       <Button asChild size="lg" variant="outline" className="w-full">
-        <a href={PHONE_HREF}>
+        <a
+          href={PHONE_HREF}
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = PHONE_HREF;
+          }}
+        >
           <Phone className="h-4 w-4 mr-2" />
           Or call today {PHONE_NUMBER}
         </a>
