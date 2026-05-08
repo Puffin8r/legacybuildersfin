@@ -173,7 +173,10 @@ export default function FutureBlueprint() {
         </CardContent>
       </Card>
 
-      {/* Book CTA */}
+      {/* Retirement Income Planner */}
+      <RetirementIncomePlanner />
+
+
       <Card className="border-2 border-primary bg-primary/5">
         <CardContent className="p-5 text-center space-y-2">
           <CalendarCheck className="h-8 w-8 text-primary mx-auto"/>
