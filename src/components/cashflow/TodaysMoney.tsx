@@ -134,7 +134,7 @@ function SafeToSpendCard({ safe }: { safe: ReturnType<typeof calcSafeToSpend> })
   return (
     <Card className={`border-2 ${tone.ring}`}>
       <CardContent className="p-5">
-        <div className="flex items-center gap-2 text-sm font-medium opacity-80"><Icon className="h-4 w-4"/>Safe to spend</div>
+        <div className="flex items-center gap-2 text-sm font-medium opacity-80"><Icon className="h-4 w-4"/>Safe to spend <InfoTip tip="safeToSpend" /></div>
         <p className="text-5xl font-bold font-heading mt-1">{formatMoney(safe.amount)}</p>
         <p className="text-sm mt-1 opacity-80">
           Until {safe.nextPaycheckDate ? new Date(safe.nextPaycheckDate).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" }) : "next 30 days"} · {tone.label}
