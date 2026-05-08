@@ -325,6 +325,15 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
   );
 }
 
+function StatTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className={`rounded-md border p-2 ${accent ? "bg-success/10 border-success/30" : "bg-background/60"}`}>
+      <p className="text-[10px] uppercase text-muted-foreground tracking-wide">{label}</p>
+      <p className={`text-lg font-bold font-heading ${accent ? "text-success" : ""}`}>{value}</p>
+    </div>
+  );
+}
+
 function FvCell({ label, value }: { label: string; value: number }) {
   return (
     <div>
