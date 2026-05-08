@@ -102,12 +102,17 @@ export default function RetirementIncomePlanner() {
     return { age, value: projection[idx]?.value ?? 0 };
   });
 
-  // Roth IRA helper
-  const recommendedRothMonthly = Math.round(ROTH_LIMIT_2025 / 12);
-  const currentRothAnnual = deferred.currentRothMonthly * 12;
-  const remainingRothAnnual = Math.max(ROTH_LIMIT_2025 - currentRothAnnual, 0);
-  const remainingRothMonthly = Math.round(remainingRothAnnual / 12);
-  const isMaxingRoth = currentRothAnnual >= ROTH_LIMIT_2025;
+  // Roth IRA helper — limit depends on age
+  const rothLimit = deferred.currentAge >= 50 ? ROTH_LIMIT_50_PLUS : ROTH_LIMIT_UNDER_50;
+  const recommendedRothMonthly = Math.round(rothLimit / 12);
+  const currentRothAnnual = Math.max(deferred.currentRothMonthly, 0) * 12;
+  const cappedRothAnnual = Math.min(currentRothAnnual, rothLimit);
+  const rothPct = rothLimit > 0 ? Math.min(100, (cappedRothAnnual / rothLimit) * 100) : 0;
+  const remainingRothAnnual = Math.max(rothLimit - currentRothAnnual, 0);
+  const remainingRothMonthly = Math.max(0, Math.round((remainingRothAnnual / 12) * 100) / 100);
+  const overageAnnual = Math.max(currentRothAnnual - rothLimit, 0);
+  const isMaxingRoth = currentRothAnnual >= rothLimit && currentRothAnnual <= rothLimit + 1;
+  const isOverContributing = currentRothAnnual > rothLimit;
 
   // Insights
   const yearsAtBoosted = yearsToTarget(requiredPortfolio, deferred.currentSavings, whatIf + 150, deferred.expectedReturn);
