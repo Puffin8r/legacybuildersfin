@@ -15,6 +15,7 @@ import {
 import { todaysInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
+import { InfoTip } from "@/components/ui/info-tip";
 
 type Freq = "once" | "weekly" | "biweekly" | "monthly";
 
@@ -94,7 +95,9 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
           <CardContent className="p-4 flex items-start gap-3">
             <ShieldAlert className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-destructive">Overdraft warning</p>
+              <p className="font-semibold text-destructive flex items-center gap-1">
+                Danger day ahead <InfoTip tip="overdraft" />
+              </p>
               <p className="text-sm">
                 You may hit <span className="font-bold">{formatMoney(overdraft.ending)}</span> on{" "}
                 <span className="font-medium">{new Date(overdraft.date).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" })}</span>.
@@ -131,7 +134,7 @@ function SafeToSpendCard({ safe }: { safe: ReturnType<typeof calcSafeToSpend> })
   return (
     <Card className={`border-2 ${tone.ring}`}>
       <CardContent className="p-5">
-        <div className="flex items-center gap-2 text-sm font-medium opacity-80"><Icon className="h-4 w-4"/>Safe to spend</div>
+        <div className="flex items-center gap-2 text-sm font-medium opacity-80"><Icon className="h-4 w-4"/>Safe to spend <InfoTip tip="safeToSpend" /></div>
         <p className="text-5xl font-bold font-heading mt-1">{formatMoney(safe.amount)}</p>
         <p className="text-sm mt-1 opacity-80">
           Until {safe.nextPaycheckDate ? new Date(safe.nextPaycheckDate).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" }) : "next 30 days"} · {tone.label}

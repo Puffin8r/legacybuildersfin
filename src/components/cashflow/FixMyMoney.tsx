@@ -20,6 +20,7 @@ import { fixInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 import { toast } from "sonner";
+import { InfoTip } from "@/components/ui/info-tip";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
   const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
@@ -126,7 +127,10 @@ function PayoffOrderCard({
   return (
     <Card className={highlight ? "border-2 border-primary" : ""}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2"><Icon className="h-4 w-4"/>{title}</CardTitle>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Icon className="h-4 w-4"/>{title}
+          <InfoTip tip={title.toLowerCase() === "snowball" ? "snowball" : "avalanche"} />
+        </CardTitle>
         <p className="text-xs text-muted-foreground">{subtitle}</p>
       </CardHeader>
       <CardContent className="space-y-1.5">
@@ -372,7 +376,7 @@ function WeeklyCheckIn({ cf }: { cf: CashFlow }) {
                 </div>
               ))}
           </div>
-          <CheckInRow icon={Target} label="Safe to spend" value={formatMoney(safe.amount)}
+          <CheckInRow icon={Target} label="Safe to spend" tipKey="safeToSpend" value={formatMoney(safe.amount)}
             positive={safe.amount >= 0} negative={safe.amount < 0}/>
           <div className="rounded-lg border bg-warning/10 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold"><Repeat className="h-4 w-4"/>Money leak to fix</div>
@@ -388,10 +392,10 @@ function WeeklyCheckIn({ cf }: { cf: CashFlow }) {
   );
 }
 
-function CheckInRow({ icon: Icon, label, value, positive, negative }: { icon: typeof Target; label: string; value: string; positive?: boolean; negative?: boolean }) {
+function CheckInRow({ icon: Icon, label, value, positive, negative, tipKey }: { icon: typeof Target; label: string; value: string; positive?: boolean; negative?: boolean; tipKey?: "safeToSpend" | "overdraft" | "snowball" | "avalanche" | "ruleOf72" | "fin" }) {
   return (
     <div className="flex items-center justify-between border-b pb-2">
-      <div className="flex items-center gap-2 text-sm"><Icon className="h-4 w-4 text-muted-foreground"/>{label}</div>
+      <div className="flex items-center gap-2 text-sm"><Icon className="h-4 w-4 text-muted-foreground"/>{label}{tipKey && <InfoTip tip={tipKey} />}</div>
       <span className={`font-bold ${positive ? "text-success" : ""} ${negative ? "text-destructive" : ""}`}>{value}</span>
     </div>
   );

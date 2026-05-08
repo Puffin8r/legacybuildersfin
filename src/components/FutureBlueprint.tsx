@@ -13,6 +13,7 @@ import BookReviewDialog from "@/components/BookReviewDialog";
 import { futureInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
+import { InfoTip } from "@/components/ui/info-tip";
 
 interface SimpleInputs {
   currentAge: number;
@@ -108,8 +109,8 @@ export default function FutureBlueprint() {
 
       {/* Key metrics */}
       <div className="grid grid-cols-2 gap-3">
-        <Metric icon={Target} label="FIN (your number)" value={formatCurrency(fin)} hint={`${formatCurrency(annualExpenses)}/yr ÷ 4%`}/>
-        <Metric icon={Clock} label="Years to double" value={ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`} hint="Rule of 72"/>
+        <Metric icon={Target} label="FIN (your number)" tipKey="fin" value={formatCurrency(fin)} hint={`${formatCurrency(annualExpenses)}/yr ÷ 4%`}/>
+        <Metric icon={Clock} label="Years to double" tipKey="ruleOf72" value={ruleOf72 === Infinity ? "—" : `${ruleOf72.toFixed(1)} yrs`} hint="Rule of 72"/>
         <Metric icon={Coins} label="Monthly income at retirement" value={formatCurrency(monthlyRetirementIncome)} hint="At 4% withdrawal"/>
         <Metric icon={TrendingUp} label="Projected at retirement" value={formatCurrency(projected)} hint={`In ${yearsToRetire} years`}/>
       </div>
@@ -198,11 +199,11 @@ function Field({ label, value, onChange, prefix, suffix }: { label: string; valu
   );
 }
 
-function Metric({ icon: Icon, label, value, hint }: { icon: typeof Target; label: string; value: string; hint?: string }) {
+function Metric({ icon: Icon, label, value, hint, tipKey }: { icon: typeof Target; label: string; value: string; hint?: string; tipKey?: "safeToSpend" | "overdraft" | "snowball" | "avalanche" | "ruleOf72" | "fin" }) {
   return (
     <Card>
       <CardContent className="p-3">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5"/>{label}</div>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5"/>{label}{tipKey && <InfoTip tip={tipKey} />}</div>
         <p className="text-lg font-bold font-heading mt-1 leading-tight">{value}</p>
         {hint && <p className="text-[10px] text-muted-foreground mt-0.5">{hint}</p>}
       </CardContent>

@@ -1,34 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon } from "lucide-react";
+import { Wallet, PieChart, Sparkles, TrendingUp, Settings as SettingsIcon, MessageCircle } from "lucide-react";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import TodaysMoney from "@/components/cashflow/TodaysMoney";
 import WhereItWent from "@/components/cashflow/WhereItWent";
 import FixMyMoney from "@/components/cashflow/FixMyMoney";
 import FutureBlueprint from "@/components/FutureBlueprint";
-import MoneyCoachChat from "@/components/ai/MoneyCoachChat";
+import MoneyCoachChat, { type CoachTab } from "@/components/ai/MoneyCoachChat";
+import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
 import { cn } from "@/lib/utils";
 
-type Tab = "today" | "where" | "fix" | "future";
+type Tab = CoachTab;
 
 const TABS: { id: Tab; label: string; icon: typeof Wallet }[] = [
-  { id: "today",  label: "Today",      icon: Wallet },
-  { id: "where",  label: "Where",      icon: PieChart },
-  { id: "fix",    label: "Fix",        icon: Sparkles },
-  { id: "future", label: "Future",     icon: TrendingUp },
+  { id: "today",  label: "Today",    icon: Wallet },
+  { id: "where",  label: "Spending", icon: PieChart },
+  { id: "fix",    label: "Fix",      icon: Sparkles },
+  { id: "future", label: "Future",   icon: TrendingUp },
 ];
 
 const TITLES: Record<Tab, { title: string; subtitle: string }> = {
-  today:  { title: "Today's Money",   subtitle: "What's in. What's out. Right now." },
-  where:  { title: "Where It Went",   subtitle: "See where your money disappeared." },
-  fix:    { title: "Fix My Money",    subtitle: "Simple steps to avoid overdrafts." },
-  future: { title: "Future Blueprint", subtitle: "Plan long-term wealth & retirement." },
+  today:  { title: "Today's Money",  subtitle: "Money in. Money out. Right now." },
+  where:  { title: "Where it went",  subtitle: "See where your money disappeared." },
+  fix:    { title: "Fix my money",   subtitle: "Simple steps to avoid danger days." },
+  future: { title: "Future plan",    subtitle: "Plan long-term wealth & retirement." },
 };
 
 export default function Index() {
   const [tab, setTab] = useState<Tab>("today");
+  const [coachOpen, setCoachOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const cf = useCashFlow();
   const meta = TITLES[tab];
+
+  useEffect(() => {
+    if (shouldShowOnboarding()) setShowOnboarding(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -55,11 +62,18 @@ export default function Index() {
         {tab === "future" && <FutureBlueprint />}
       </main>
 
-      <MoneyCoachChat cf={cf} tab={tab} />
+      <MoneyCoachChat cf={cf} tab={tab} open={coachOpen} onOpenChange={setCoachOpen} hideFab />
 
-      {/* Bottom nav (mobile-first) */}
+      <OnboardingDialog
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onFinish={() => setTab("today")}
+        cf={cf}
+      />
+
+      {/* Bottom nav (mobile-first) — Today / Spending / Fix / Future / Coach */}
       <nav className="fixed bottom-0 inset-x-0 z-30 border-t bg-card/95 backdrop-blur">
-        <div className="max-w-2xl mx-auto grid grid-cols-4">
+        <div className="max-w-2xl mx-auto grid grid-cols-5">
           {TABS.map(t => {
             const Icon = t.icon;
             const active = tab === t.id;
@@ -68,7 +82,7 @@ export default function Index() {
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center py-2.5 gap-1 text-xs font-medium transition-colors",
+                  "relative flex flex-col items-center justify-center py-2.5 gap-1 text-xs font-medium transition-colors",
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -78,6 +92,19 @@ export default function Index() {
               </button>
             );
           })}
+          <button
+            onClick={() => setCoachOpen(true)}
+            className={cn(
+              "relative flex flex-col items-center justify-center py-2.5 gap-1 text-xs font-semibold transition-colors",
+              coachOpen ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            )}
+            aria-label="Open AI Money Coach"
+          >
+            <span className="h-7 w-7 -mt-0.5 rounded-full bg-gradient-to-br from-primary to-secondary text-primary-foreground flex items-center justify-center shadow">
+              <MessageCircle className="h-4 w-4" />
+            </span>
+            <span>Coach</span>
+          </button>
         </div>
       </nav>
     </div>
