@@ -257,6 +257,44 @@ export default function MoneyCoachChat({
 
   const tabSuggestions = SUGGESTED[tab];
 
+  const recentFix = recent.fix ?? [];
+  const recentFuture = recent.future ?? [];
+  const totalRecent = recentFix.length + recentFuture.length;
+
+  const RecentList = ({ compact }: { compact?: boolean }) => {
+    if (totalRecent === 0) return null;
+    return (
+      <div className={compact ? "space-y-2" : "space-y-3"}>
+        {recentFix.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-secondary mb-1.5">Fix my money — recent</p>
+            <div className="flex flex-wrap gap-1.5">
+              {recentFix.map(p => (
+                <button key={"f-" + p} onClick={() => send(p)}
+                  className="text-xs rounded-full border bg-background hover:bg-accent px-3 py-1.5 text-left transition-colors">
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {recentFuture.length > 0 && (
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-primary mb-1.5">Future plan — recent</p>
+            <div className="flex flex-wrap gap-1.5">
+              {recentFuture.map(p => (
+                <button key={"u-" + p} onClick={() => send(p)}
+                  className="text-xs rounded-full border bg-background hover:bg-accent px-3 py-1.5 text-left transition-colors">
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // If parent opened the chat with a starter prompt, send it once.
   useEffect(() => {
     if (open && initialPrompt && !loading && messages.length === 0) {
