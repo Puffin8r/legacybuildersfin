@@ -10,7 +10,9 @@ import {
 import { PiggyBank, Target, Sparkles, TrendingUp } from "lucide-react";
 import { formatCurrency, calcProjectionData } from "@/lib/financial-calculations";
 
-const ROTH_LIMIT_2025 = 7000; // under 50
+// 2025 IRS Roth IRA contribution limits
+const ROTH_LIMIT_UNDER_50 = 7000;
+const ROTH_LIMIT_50_PLUS = 8000; // includes $1,000 catch-up
 
 interface Inputs {
   currentAge: number;
