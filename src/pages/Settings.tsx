@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Building2, Webhook, Calendar, Users, Github, Upload, Sparkles, CheckCircle2, Send } from "lucide-react";
+import { ArrowLeft, Building2, Webhook, Calendar, Users, Github, Upload, Sparkles, CheckCircle2, Send, PlayCircle } from "lucide-react";
+import IntroVideoDialog from "@/components/IntroVideoDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
