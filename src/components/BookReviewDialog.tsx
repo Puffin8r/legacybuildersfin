@@ -3,15 +3,18 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ExternalLink } from "lucide-react";
+import { CalendarCheck, ExternalLink, Phone } from "lucide-react";
 
 const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
+const PHONE_NUMBER = "(951) 421-1177";
+const PHONE_HREF = "tel:+19514211177";
 
 export default function BookReviewDialog() {
   const [open, setOpen] = useState(false);
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   return (
+    <div className="w-full space-y-2">
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="lg" className="w-full">
@@ -53,5 +56,12 @@ export default function BookReviewDialog() {
         </div>
       </DialogContent>
     </Dialog>
+      <Button asChild size="lg" variant="outline" className="w-full">
+        <a href={PHONE_HREF}>
+          <Phone className="h-4 w-4 mr-2" />
+          Or call today {PHONE_NUMBER}
+        </a>
+      </Button>
+    </div>
   );
 }
