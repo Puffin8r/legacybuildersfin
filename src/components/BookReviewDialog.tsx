@@ -56,5 +56,12 @@ export default function BookReviewDialog() {
         </div>
       </DialogContent>
     </Dialog>
+      <Button asChild size="lg" variant="outline" className="w-full">
+        <a href={PHONE_HREF}>
+          <Phone className="h-4 w-4 mr-2" />
+          Or call today {PHONE_NUMBER}
+        </a>
+      </Button>
+    </div>
   );
 }
