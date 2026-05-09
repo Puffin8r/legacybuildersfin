@@ -3,7 +3,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ExternalLink, Phone } from "lucide-react";
+import { CalendarCheck, ExternalLink, Phone, Copy, Check } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
 const PHONE_NUMBER = "(951) 421-1177";
@@ -15,6 +16,19 @@ interface BookReviewDialogProps {
 
 export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
   const [open, setOpen] = useState(false);
+  const [callOpen, setCallOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(PHONE_NUMBER);
+      setCopied(true);
+      toast({ title: "Number copied", description: PHONE_NUMBER });
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      toast({ title: "Copy failed", description: PHONE_NUMBER });
+    }
+  };
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   const isFounder = variant === "founder";
