@@ -16,6 +16,8 @@ import { todaysInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 import { InfoTip } from "@/components/ui/info-tip";
+import StatusHero from "./StatusHero";
+import { useGameStats } from "@/hooks/useGameStats";
 
 type Freq = "once" | "weekly" | "biweekly" | "monthly";
 
@@ -63,26 +65,29 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     });
   }, [overdraft, totalCash]);
 
+  const game = useGameStats(cf);
+  const monthSaved = useMemo(() => {
+    const incomeThisMonth = cf.income.reduce((s, i) => {
+      const per = i.frequency === "weekly" ? 4 : i.frequency === "biweekly" ? 2 : 1;
+      return s + i.amount * per;
+    }, 0);
+    return incomeThisMonth - monthBills - monthSpend;
+  }, [cf.income, monthBills, monthSpend]);
+
   return (
     <div className="space-y-4">
-      {/* SNAPSHOT */}
-      <Card className="border-2 overflow-hidden">
-        <CardContent className="p-5 space-y-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Cash on hand</p>
-            <p className="text-4xl font-bold font-heading">{formatMoney(totalCash)}</p>
-          </div>
+      {/* PREMIUM STATUS HERO */}
+      <StatusHero totalCash={totalCash} monthSaved={monthSaved} game={game} />
 
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <Stat label="Next paycheck" value={nextPaycheck ? `+${formatMoney(nextPaycheck.amount)}` : "—"}
-                  hint={nextPaycheck ? `in ${daysUntil(nextPaycheck.date)}d` : "Add income"} positive />
-            <Stat label="Upcoming bill" value={cf.bills.length ? formatMoney([...cf.bills].sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0].amount) : "—"}
-                  hint={cf.bills.length ? [...cf.bills].sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0].name : "Add bills"} />
-            <Stat label="Bills this month" value={formatMoney(monthBills)} />
-            <Stat label="Spending this month" value={formatMoney(monthSpend)} />
-          </div>
-        </CardContent>
-      </Card>
+      {/* QUICK STATS */}
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        <Stat label="Next paycheck" value={nextPaycheck ? `+${formatMoney(nextPaycheck.amount)}` : "—"}
+              hint={nextPaycheck ? `in ${daysUntil(nextPaycheck.date)}d` : "Add income"} positive />
+        <Stat label="Upcoming bill" value={cf.bills.length ? formatMoney([...cf.bills].sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0].amount) : "—"}
+              hint={cf.bills.length ? [...cf.bills].sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0].name : "Add bills"} />
+        <Stat label="Bills this month" value={formatMoney(monthBills)} />
+        <Stat label="Spending this month" value={formatMoney(monthSpend)} />
+      </div>
 
       <InsightList insights={insights} />
 
