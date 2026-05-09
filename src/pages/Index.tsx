@@ -105,6 +105,15 @@ export default function Index() {
             </p>
             <BookReviewDialog variant="founder" />
           </section>
+        ) : tab === "fix" ? (
+          <section className="mt-6 rounded-2xl border border-[#10b981]/30 bg-gradient-to-br from-[#04110d] via-[#061a14] to-[#0a0a12] p-4 shadow-[0_10px_40px_-15px_rgba(16,185,129,0.45)]">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#34d399]/80 mb-1">Concierge</p>
+            <h3 className="text-sm font-semibold mb-1 text-white">Want a hand from a real human?</h3>
+            <p className="text-xs text-white/60 mb-3">
+              Book a free 30-minute financial review with our team.
+            </p>
+            <BookReviewDialog variant="emerald" />
+          </section>
         ) : (
           <section className="mt-6 rounded-2xl border bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
             <h3 className="text-sm font-semibold mb-1">Want a hand from a real human?</h3>
