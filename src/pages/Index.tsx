@@ -12,6 +12,7 @@ import MoneyCoachChat, { type CoachTab, SUGGESTED } from "@/components/ai/MoneyC
 import OnboardingDialog, { shouldShowOnboarding } from "@/components/onboarding/OnboardingDialog";
 import ManageDataSheet from "@/components/cashflow/ManageDataSheet";
 import BookReviewDialog from "@/components/BookReviewDialog";
+import RescheduleBanner from "@/components/RescheduleBanner";
 import { cn } from "@/lib/utils";
 
 type Tab = CoachTab;
@@ -87,6 +88,7 @@ export default function Index() {
       </header>
 
       <main className="px-4 py-5 max-w-2xl mx-auto">
+        <RescheduleBanner />
         <h2 className="section-title mb-4">{meta.title}</h2>
         {tab === "today"  && <TodaysMoney cf={cf} />}
         {tab === "where"  && <WhereItWent cf={cf} />}
