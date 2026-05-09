@@ -32,6 +32,8 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
               ? "w-full border-0 text-[#1a1d24] hover:opacity-95"
               : isEmerald
               ? "w-full border-0 text-white hover:opacity-95"
+              : isSpending
+              ? "w-full border-0 bg-black text-[#dc2626] hover:bg-black/90"
               : "w-full"
           }
           style={
@@ -44,6 +46,11 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
               ? {
                   background: "linear-gradient(135deg, #10b981 0%, #34d399 50%, #059669 100%)",
                   boxShadow: "0 0 24px rgba(16,185,129,0.45)",
+                }
+              : isSpending
+              ? {
+                  background: "#000000",
+                  boxShadow: "0 0 24px rgba(220,38,38,0.4)",
                 }
               : undefined
           }
