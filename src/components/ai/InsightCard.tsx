@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 import type { MoneyInsight } from "@/lib/ai-insights";
 
 const TONE = {
-  positive: { ring: "border-success/40 bg-success/5", icon: CheckCircle2, color: "text-success" },
-  warning:  { ring: "border-warning/40 bg-warning/10", icon: AlertTriangle, color: "text-warning" },
-  danger:   { ring: "border-destructive/40 bg-destructive/5", icon: ShieldAlert, color: "text-destructive" },
-  neutral:  { ring: "border-primary/30 bg-primary/5", icon: Info, color: "text-primary" },
+  positive: { ring: "border-success/40 bg-white text-slate-900", icon: CheckCircle2, color: "text-success" },
+  warning:  { ring: "border-warning/40 bg-white text-slate-900", icon: AlertTriangle, color: "text-warning" },
+  danger:   { ring: "border-destructive/40 bg-white text-slate-900", icon: ShieldAlert, color: "text-destructive" },
+  neutral:  { ring: "border-primary/30 bg-white text-slate-900", icon: Info, color: "text-primary" },
 };
 
 export default function InsightCard({ insight }: { insight: MoneyInsight }) {
