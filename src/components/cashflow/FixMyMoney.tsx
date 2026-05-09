@@ -49,7 +49,8 @@ export default function FixMyMoney({ cf }: { cf: CashFlow }) {
 
       <Tabs defaultValue="debt" className="w-full">
         <TabsList
-          className={`w-full grid grid-cols-3 sm:grid-cols-6 h-auto bg-white/5 border border-white/10 backdrop-blur-sm ${glow ? "neon-purple-glow" : ""}`}
+          className={`w-full grid grid-cols-3 sm:grid-cols-6 h-auto border border-white/10 backdrop-blur-sm ${glow ? "neon-green-glow" : ""}`}
+          style={{ background: "linear-gradient(90deg, #10b981 0%, #059669 35%, #04110d 75%, #000000 100%)" }}
         >
           <TabsTrigger value="debt" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Debt</TabsTrigger>
           <TabsTrigger value="save" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Save</TabsTrigger>
