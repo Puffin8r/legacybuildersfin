@@ -21,10 +21,26 @@ import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 
 const COLORS = [
-  "hsl(0 78% 52%)", "hsl(var(--secondary))", "hsl(var(--accent))",
+  "#dc2626", "#3b82f6", "hsl(var(--accent))",
   "hsl(var(--destructive))", "hsl(var(--success))", "hsl(var(--warning))",
   "hsl(220 30% 50%)", "hsl(280 50% 55%)", "hsl(15 75% 55%)",
   "hsl(160 50% 45%)", "hsl(45 80% 50%)", "hsl(220 10% 55%)",
+];
+
+// Gradient backgrounds for bars (color → black middle → color)
+const BAR_GRADIENTS = [
+  "linear-gradient(90deg, #dc2626 0%, #000000 50%, #dc2626 100%)",
+  "linear-gradient(90deg, #3b82f6 0%, #000000 50%, #3b82f6 100%)",
+  "linear-gradient(90deg, hsl(var(--accent)) 0%, #000000 50%, hsl(var(--accent)) 100%)",
+];
+function gradientFor(i: number) {
+  return BAR_GRADIENTS[i] ?? COLORS[i % COLORS.length];
+}
+// Recharts SVG gradient ids matching BAR_GRADIENTS
+const BAR_GRADIENT_STOPS: Array<[string, string]> = [
+  ["#dc2626", "#000000"],
+  ["#3b82f6", "#000000"],
+  ["#a78bfa", "#000000"],
 ];
 
 const txSchema = z.object({
@@ -107,7 +123,7 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
                   <span><span className="font-semibold">{formatMoney(c.value)}</span> <span className="text-muted-foreground">· {c.pct.toFixed(0)}%</span></span>
                 </div>
                 <div className="h-2 mt-1 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${c.pct}%`, background: COLORS[i % COLORS.length] }} />
+                  <div className="h-full rounded-full" style={{ width: `${c.pct}%`, background: gradientFor(i) }} />
                 </div>
               </div>
             ))}
@@ -123,11 +139,22 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={byCategory} layout="vertical" margin={{ left: 4, right: 8 }}>
+                  <defs>
+                    {BAR_GRADIENT_STOPS.map(([start, mid], i) => (
+                      <linearGradient key={i} id={`barGrad${i}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor={start} />
+                        <stop offset="50%" stopColor={mid} />
+                        <stop offset="100%" stopColor={start} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <XAxis type="number" hide />
                   <YAxis dataKey="name" type="category" width={90} tick={{ fontSize: 11 }} axisLine={false} tickLine={false}/>
                   <Tooltip formatter={(v: number) => formatMoney(v)} />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} isAnimationActive={false}>
-                    {byCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    {byCategory.map((_, i) => (
+                      <Cell key={i} fill={i < BAR_GRADIENT_STOPS.length ? `url(#barGrad${i})` : COLORS[i % COLORS.length]} />
+                    ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
