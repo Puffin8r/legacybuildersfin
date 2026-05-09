@@ -110,12 +110,21 @@
 
 @layer utilities {
   .metric-card {
-    @apply bg-card rounded-xl border border-border p-6 shadow-sm transition-shadow hover:shadow-md;
+    @apply bg-card rounded-2xl border border-border p-6 shadow-sm transition-shadow hover:shadow-md;
   }
   .section-title {
     font-family: var(--font-heading);
     @apply text-xl font-semibold text-foreground;
   }
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-accent  { background: var(--gradient-accent); }
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .shadow-luxe { box-shadow: var(--shadow-luxe); }
 
   /* ===== Editorial luxury — gamified surfaces ===== */
   .luxe-card {
