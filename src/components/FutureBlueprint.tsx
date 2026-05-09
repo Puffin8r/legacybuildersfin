@@ -11,8 +11,9 @@ import { TrendingUp, Target, Clock, Coins, CalendarCheck } from "lucide-react";
 import { calcFIN, calcRuleOf72, calcFutureValue, calcProjectionData, formatCurrency } from "@/lib/financial-calculations";
 import BookReviewDialog from "@/components/BookReviewDialog";
 import RetirementIncomePlanner from "@/components/cashflow/RetirementIncomePlanner";
-import { futureInsights } from "@/lib/ai-insights";
+import { futureInsights, fixInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import { useCashFlow } from "@/hooks/useCashFlow";
 import { fireEvent } from "@/lib/integrations";
 import { InfoTip } from "@/components/ui/info-tip";
 
@@ -54,10 +55,13 @@ export default function FutureBlueprint() {
     [deferred, yearsToRetire],
   );
 
-  const insights = useMemo(() => futureInsights({
+  const cf = useCashFlow();
+  const fixIns = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
+  const futureIns = useMemo(() => futureInsights({
     fin, currentInvestments: deferred.currentInvestments, projected,
     monthlyContribution: deferred.monthlyContribution, yearsToRetire,
   }), [fin, deferred.currentInvestments, projected, deferred.monthlyContribution, yearsToRetire]);
+  const insights = useMemo(() => [...fixIns, ...futureIns], [fixIns, futureIns]);
 
   // Fire blueprint.completed once per stable input set (debounced)
   const lastBlueprintSig = useRef<string | null>(null);
