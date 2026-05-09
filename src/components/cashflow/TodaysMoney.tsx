@@ -5,17 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
-  Wallet, TrendingUp, Calendar, Plus, Trash2, AlertTriangle, CheckCircle2, ShieldAlert, ChevronRight,
+  Wallet, TrendingUp, Calendar, Plus, Trash2, AlertTriangle, CheckCircle2, ShieldAlert, ChevronRight, ChevronDown,
 } from "lucide-react";
 import { formatMoney, daysUntil } from "@/lib/cashflow-types";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import {
   buildTimeline, firstOverdraft, billsThisMonth, spendingThisMonth, calcSafeToSpend,
 } from "@/lib/cashflow-engine";
-import { todaysInsights } from "@/lib/ai-insights";
-import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
-import { InfoTip } from "@/components/ui/info-tip";
 import StatusHero from "./StatusHero";
 import { useGameStats } from "@/hooks/useGameStats";
 
