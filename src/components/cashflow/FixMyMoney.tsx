@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,27 +25,38 @@ import CancelAndInvest from "./CancelAndInvest";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
   const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
+  const [glow, setGlow] = useState(true);
+  const fired = useRef(false);
+  useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
+    const t = setTimeout(() => setGlow(false), 2000);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
-    <div className="space-y-4">
+    <div className="fix-emerald-bg -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 rounded-2xl text-white space-y-4">
       <InsightList insights={insights} />
-      <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
+      <Card className="fix-emerald-card">
         <CardContent className="p-4 flex items-start gap-3">
-          <Sparkles className="h-6 w-6 text-primary shrink-0 mt-0.5"/>
+          <Sparkles className="h-6 w-6 shrink-0 mt-0.5" style={{ color: "#34d399" }}/>
           <div>
-            <p className="font-heading text-lg font-semibold leading-tight">Fix My Money</p>
-            <p className="text-sm text-muted-foreground">Pay off debt, build savings, and reset every month.</p>
+            <p className="font-heading text-lg font-semibold leading-tight text-white">Fix My Money</p>
+            <p className="text-sm text-white/70">Pay off debt, build savings, and reset every month.</p>
           </div>
         </CardContent>
       </Card>
 
       <Tabs defaultValue="debt" className="w-full">
-        <TabsList className="w-full grid grid-cols-3 sm:grid-cols-6 h-auto">
-          <TabsTrigger value="debt" className="text-xs px-1 py-2">Debt</TabsTrigger>
-          <TabsTrigger value="save" className="text-xs px-1 py-2">Save</TabsTrigger>
-          <TabsTrigger value="cancel" className="text-xs px-1 py-2">Cancel</TabsTrigger>
-          <TabsTrigger value="week" className="text-xs px-1 py-2">Week</TabsTrigger>
-          <TabsTrigger value="reset" className="text-xs px-1 py-2">Reset</TabsTrigger>
-          <TabsTrigger value="next" className="text-xs px-1 py-2">Next</TabsTrigger>
+        <TabsList
+          className={`w-full grid grid-cols-3 sm:grid-cols-6 h-auto bg-white/5 border border-white/10 backdrop-blur-sm ${glow ? "neon-purple-glow" : ""}`}
+        >
+          <TabsTrigger value="debt" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Debt</TabsTrigger>
+          <TabsTrigger value="save" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Save</TabsTrigger>
+          <TabsTrigger value="cancel" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Cancel</TabsTrigger>
+          <TabsTrigger value="week" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Week</TabsTrigger>
+          <TabsTrigger value="reset" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Reset</TabsTrigger>
+          <TabsTrigger value="next" className="text-xs px-1 py-2 text-white/80 data-[state=active]:bg-white data-[state=active]:text-[#04110d]">Next</TabsTrigger>
         </TabsList>
 
         <TabsContent value="debt" className="space-y-3 mt-3"><DebtFreedomMap cf={cf}/></TabsContent>
