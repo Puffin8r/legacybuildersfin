@@ -10,7 +10,7 @@ const PHONE_NUMBER = "(951) 421-1177";
 const PHONE_HREF = "tel:+19514211177";
 
 interface BookReviewDialogProps {
-  variant?: "default" | "founder";
+  variant?: "default" | "founder" | "emerald";
 }
 
 export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
@@ -18,6 +18,7 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   const isFounder = variant === "founder";
+  const isEmerald = variant === "emerald";
 
   return (
     <div className="w-full space-y-2">
@@ -25,12 +26,23 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
       <DialogTrigger asChild>
         <Button
           size="lg"
-          className={isFounder ? "w-full border-0 text-[#1a1d24] hover:opacity-95" : "w-full"}
+          className={
+            isFounder
+              ? "w-full border-0 text-[#1a1d24] hover:opacity-95"
+              : isEmerald
+              ? "w-full border-0 text-white hover:opacity-95"
+              : "w-full"
+          }
           style={
             isFounder
               ? {
                   background: "linear-gradient(135deg, #caa15a 0%, #f3dca0 50%, #caa15a 100%)",
                   boxShadow: "0 0 24px rgba(202,161,90,0.4)",
+                }
+              : isEmerald
+              ? {
+                  background: "linear-gradient(135deg, #10b981 0%, #34d399 50%, #059669 100%)",
+                  boxShadow: "0 0 24px rgba(16,185,129,0.45)",
                 }
               : undefined
           }
@@ -77,7 +89,13 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
         asChild
         size="lg"
         variant="outline"
-        className={isFounder ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]" : "w-full"}
+        className={
+          isFounder
+            ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
+            : isEmerald
+            ? "w-full bg-white border-2 border-[#10b981]/60 hover:bg-white/90"
+            : "w-full"
+        }
       >
         <a
           href={PHONE_HREF}
@@ -86,8 +104,30 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
             window.location.href = PHONE_HREF;
           }}
         >
-          <Phone className="h-4 w-4 mr-2" />
-          Or call today {PHONE_NUMBER}
+          {isEmerald ? (
+            <>
+              <Phone
+                className="h-4 w-4 mr-2"
+                style={{ color: "#10b981" }}
+              />
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                  fontWeight: 600,
+                }}
+              >
+                Or call today {PHONE_NUMBER}
+              </span>
+            </>
+          ) : (
+            <>
+              <Phone className="h-4 w-4 mr-2" />
+              Or call today {PHONE_NUMBER}
+            </>
+          )}
         </a>
       </Button>
     </div>
