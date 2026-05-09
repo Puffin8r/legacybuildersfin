@@ -89,7 +89,13 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
         asChild
         size="lg"
         variant="outline"
-        className={isFounder ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]" : "w-full"}
+        className={
+          isFounder
+            ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
+            : isEmerald
+            ? "w-full bg-white border-2 border-[#10b981]/60 hover:bg-white/90"
+            : "w-full"
+        }
       >
         <a
           href={PHONE_HREF}
@@ -98,8 +104,30 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
             window.location.href = PHONE_HREF;
           }}
         >
-          <Phone className="h-4 w-4 mr-2" />
-          Or call today {PHONE_NUMBER}
+          {isEmerald ? (
+            <>
+              <Phone
+                className="h-4 w-4 mr-2"
+                style={{ color: "#10b981" }}
+              />
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                  fontWeight: 600,
+                }}
+              >
+                Or call today {PHONE_NUMBER}
+              </span>
+            </>
+          ) : (
+            <>
+              <Phone className="h-4 w-4 mr-2" />
+              Or call today {PHONE_NUMBER}
+            </>
+          )}
         </a>
       </Button>
     </div>
