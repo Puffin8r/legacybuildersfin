@@ -21,7 +21,7 @@ import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 
 const COLORS = [
-  "hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))",
+  "hsl(0 78% 52%)", "hsl(var(--secondary))", "hsl(var(--accent))",
   "hsl(var(--destructive))", "hsl(var(--success))", "hsl(var(--warning))",
   "hsl(220 30% 50%)", "hsl(280 50% 55%)", "hsl(15 75% 55%)",
   "hsl(160 50% 45%)", "hsl(45 80% 50%)", "hsl(220 10% 55%)",
@@ -447,7 +447,14 @@ function TransactionEntry({ cf }: { cf: CashFlow }) {
             <AlertTriangle className="h-4 w-4"/>{error}
           </div>
         )}
-        <Button className="w-full" onClick={submit}><Plus className="h-4 w-4 mr-1"/>Add transaction</Button>
+        <Button
+          className="w-full border-0 text-white hover:opacity-95"
+          style={{
+            background: "linear-gradient(90deg, #dc2626 0%, #000000 50%, #dc2626 100%)",
+            boxShadow: "0 0 24px rgba(220,38,38,0.45)",
+          }}
+          onClick={submit}
+        ><Plus className="h-4 w-4 mr-1"/>Add transaction</Button>
 
         <div className="pt-3">
           <p className="text-xs uppercase text-muted-foreground tracking-wide mb-2">Recent</p>

@@ -10,7 +10,7 @@ const PHONE_NUMBER = "(951) 421-1177";
 const PHONE_HREF = "tel:+19514211177";
 
 interface BookReviewDialogProps {
-  variant?: "default" | "founder" | "emerald";
+  variant?: "default" | "founder" | "emerald" | "spending";
 }
 
 export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
@@ -19,6 +19,7 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
 
   const isFounder = variant === "founder";
   const isEmerald = variant === "emerald";
+  const isSpending = variant === "spending";
 
   return (
     <div className="w-full space-y-2">
@@ -31,6 +32,8 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
               ? "w-full border-0 text-[#1a1d24] hover:opacity-95"
               : isEmerald
               ? "w-full border-0 text-white hover:opacity-95"
+              : isSpending
+              ? "w-full border-0 bg-black text-[#dc2626] hover:bg-black/90"
               : "w-full"
           }
           style={
@@ -43,6 +46,11 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
               ? {
                   background: "linear-gradient(135deg, #10b981 0%, #34d399 50%, #059669 100%)",
                   boxShadow: "0 0 24px rgba(16,185,129,0.45)",
+                }
+              : isSpending
+              ? {
+                  background: "#000000",
+                  boxShadow: "0 0 24px rgba(220,38,38,0.4)",
                 }
               : undefined
           }
@@ -94,7 +102,17 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
             ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
             : isEmerald
             ? "w-full bg-white border-2 border-[#10b981]/60 hover:bg-white/90"
+            : isSpending
+            ? "w-full border-0 text-white hover:opacity-95"
             : "w-full"
+        }
+        style={
+          isSpending
+            ? {
+                background: "linear-gradient(90deg, #dc2626 0%, #000000 50%, #dc2626 100%)",
+                boxShadow: "0 0 24px rgba(220,38,38,0.4)",
+              }
+            : undefined
         }
       >
         <a
@@ -121,6 +139,11 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
               >
                 Or call today {PHONE_NUMBER}
               </span>
+            </>
+          ) : isSpending ? (
+            <>
+              <Phone className="h-4 w-4 mr-2 text-white" />
+              <span className="text-white font-semibold">Or call today {PHONE_NUMBER}</span>
             </>
           ) : (
             <>
