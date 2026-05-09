@@ -317,6 +317,81 @@ export type Database = {
         }
         Relationships: []
       }
+      no_show_logs: {
+        Row: {
+          created_at: string
+          event_uri: string | null
+          id: string
+          invitee_email: string | null
+          invitee_name: string | null
+          metadata: Json
+          scheduled_start: string | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_uri?: string | null
+          id?: string
+          invitee_email?: string | null
+          invitee_name?: string | null
+          metadata?: Json
+          scheduled_start?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_uri?: string | null
+          id?: string
+          invitee_email?: string | null
+          invitee_name?: string | null
+          metadata?: Json
+          scheduled_start?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       paychecks: {
         Row: {
           amount: number
