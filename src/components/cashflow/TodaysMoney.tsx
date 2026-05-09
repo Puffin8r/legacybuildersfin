@@ -16,6 +16,8 @@ import { todaysInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 import { InfoTip } from "@/components/ui/info-tip";
+import StatusHero from "./StatusHero";
+import { useGameStats } from "@/hooks/useGameStats";
 
 type Freq = "once" | "weekly" | "biweekly" | "monthly";
 
