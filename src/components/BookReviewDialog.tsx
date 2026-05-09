@@ -18,18 +18,23 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   const isFounder = variant === "founder";
-  const bookClass = isFounder
-    ? "w-full bg-gradient-to-r from-[#caa15a] to-[#f3dca0] text-[#1a1d24] hover:opacity-95 border-0 shadow-[0_0_24px_rgba(202,161,90,0.35)]"
-    : "w-full";
-  const callClass = isFounder
-    ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
-    : "w-full";
 
   return (
     <div className="w-full space-y-2">
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className={bookClass}>
+        <Button
+          size="lg"
+          className={isFounder ? "w-full border-0 text-[#1a1d24] hover:opacity-95" : "w-full"}
+          style={
+            isFounder
+              ? {
+                  background: "linear-gradient(135deg, #caa15a 0%, #f3dca0 50%, #caa15a 100%)",
+                  boxShadow: "0 0 24px rgba(202,161,90,0.4)",
+                }
+              : undefined
+          }
+        >
           <CalendarCheck className="h-4 w-4 mr-2" />
           Book a Financial Review
         </Button>
@@ -68,7 +73,12 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
         </div>
       </DialogContent>
     </Dialog>
-      <Button asChild size="lg" variant={isFounder ? "default" : "outline"} className={callClass}>
+      <Button
+        asChild
+        size="lg"
+        variant="outline"
+        className={isFounder ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]" : "w-full"}
+      >
         <a
           href={PHONE_HREF}
           onClick={(e) => {

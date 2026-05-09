@@ -74,7 +74,7 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
   const tone =
     safe.amount < 0 ? "text-destructive"
     : safe.amount < 50 ? "text-warning"
-    : "text-success";
+    : "text-[#caa15a]";
 
   return (
     <div className="space-y-10 pb-12">
