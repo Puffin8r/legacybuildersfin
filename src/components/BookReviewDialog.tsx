@@ -73,7 +73,12 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
         </div>
       </DialogContent>
     </Dialog>
-      <Button asChild size="lg" variant={isFounder ? "default" : "outline"} className={callClass}>
+      <Button
+        asChild
+        size="lg"
+        variant="outline"
+        className={isFounder ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]" : "w-full"}
+      >
         <a
           href={PHONE_HREF}
           onClick={(e) => {
