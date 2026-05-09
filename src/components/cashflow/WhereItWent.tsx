@@ -139,11 +139,22 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={byCategory} layout="vertical" margin={{ left: 4, right: 8 }}>
+                  <defs>
+                    {BAR_GRADIENT_STOPS.map(([start, mid], i) => (
+                      <linearGradient key={i} id={`barGrad${i}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor={start} />
+                        <stop offset="50%" stopColor={mid} />
+                        <stop offset="100%" stopColor={start} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <XAxis type="number" hide />
                   <YAxis dataKey="name" type="category" width={90} tick={{ fontSize: 11 }} axisLine={false} tickLine={false}/>
                   <Tooltip formatter={(v: number) => formatMoney(v)} />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} isAnimationActive={false}>
-                    {byCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    {byCategory.map((_, i) => (
+                      <Cell key={i} fill={i < BAR_GRADIENT_STOPS.length ? `url(#barGrad${i})` : COLORS[i % COLORS.length]} />
+                    ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
