@@ -43,11 +43,6 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     [totalCash, cf.income, cf.bills],
   );
 
-  const insights = useMemo(
-    () => todaysInsights({ totalCash, income: cf.income, bills: cf.bills, expenses: cf.expenses }),
-    [totalCash, cf.income, cf.bills, cf.expenses],
-  );
-
   // Fire overdraft webhook once per unique (date,ending) signature
   const lastOverdraftSig = useRef<string | null>(null);
   useEffect(() => {
@@ -71,49 +66,92 @@ export default function TodaysMoney({ cf }: { cf: CashFlow }) {
     return incomeThisMonth - monthBills - monthSpend;
   }, [cf.income, monthBills, monthSpend]);
 
+  const nextBill = useMemo(
+    () => [...cf.bills].filter(b => !b.paid).sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0] ?? null,
+    [cf.bills],
+  );
+
+  const tone =
+    safe.amount < 0 ? "text-destructive"
+    : safe.amount < 50 ? "text-warning"
+    : "text-success";
+
   return (
-    <div className="space-y-4">
-      {/* PREMIUM STATUS HERO */}
+    <div className="space-y-10 pb-12">
       <StatusHero totalCash={totalCash} monthSaved={monthSaved} game={game} />
 
-      {/* QUICK STATS */}
-      <div className="grid grid-cols-2 gap-2 text-sm">
-        <Stat label="Next paycheck" value={nextPaycheck ? `+${formatMoney(nextPaycheck.amount)}` : "—"}
-              hint={nextPaycheck ? `in ${daysUntil(nextPaycheck.date)}d` : "Add income"} positive />
-        <Stat label="Upcoming bill" value={cf.bills.length ? formatMoney([...cf.bills].sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0].amount) : "—"}
-              hint={cf.bills.length ? [...cf.bills].sort((a,b)=>daysUntil(a.due_date)-daysUntil(b.due_date))[0].name : "Add bills"} />
-        <Stat label="Bills this month" value={formatMoney(monthBills)} />
-        <Stat label="Spending this month" value={formatMoney(monthSpend)} />
-      </div>
+      <section className="text-center pt-6 pb-2">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-3">Safe to spend today</p>
+        <p className={`text-7xl md:text-8xl font-heading font-bold tracking-tight tabular-nums ${tone}`}>
+          {formatMoney(safe.amount)}
+        </p>
+        <p className="text-sm text-muted-foreground mt-3">
+          Until {safe.nextPaycheckDate
+            ? new Date(safe.nextPaycheckDate).toLocaleDateString("en", { weekday: "long", month: "short", day: "numeric" })
+            : "your next 30 days"}
+        </p>
+      </section>
 
-      <InsightList insights={insights} />
-
-      {/* SAFE TO SPEND */}
-      <SafeToSpendCard safe={safe} />
-
-      {/* OVERDRAFT WARNING */}
       {overdraft && (
-        <Card className="border-2 border-destructive bg-destructive/5">
-          <CardContent className="p-4 flex items-start gap-3">
-            <ShieldAlert className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-destructive flex items-center gap-1">
-                Danger day ahead <InfoTip tip="overdraft" />
-              </p>
-              <p className="text-sm">
-                You may hit <span className="font-bold">{formatMoney(overdraft.ending)}</span> on{" "}
-                <span className="font-medium">{new Date(overdraft.date).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" })}</span>.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mx-auto max-w-md flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+          <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium text-destructive">Heads up</p>
+            <p className="text-muted-foreground">
+              You may dip to {formatMoney(overdraft.ending)} on{" "}
+              {new Date(overdraft.date).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" })}.
+            </p>
+          </div>
+        </div>
       )}
 
-      <CashCard cf={cf} />
-      <PaycheckPlanner cf={cf} />
-      <BillPlanner cf={cf} />
-      <Timeline timeline={timeline} />
+      {nextBill && (
+        <section className="mx-auto max-w-md">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-2 text-center">Next up</p>
+          <button
+            onClick={() => cf.updateBill(nextBill.id, { paid: true })}
+            className="w-full flex items-center justify-between rounded-xl border bg-card p-4 hover:bg-muted/40 transition"
+          >
+            <div className="text-left">
+              <p className="font-medium">{nextBill.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {(() => { const d = daysUntil(nextBill.due_date); return d === 0 ? "Due today" : d < 0 ? `${-d}d overdue` : `Due in ${d}d`; })()}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-semibold tabular-nums">{formatMoney(nextBill.amount)}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Tap to mark paid</p>
+            </div>
+          </button>
+        </section>
+      )}
+
+      <Disclosure label="Accounts" hint={formatMoney(totalCash)}><CashCard cf={cf} /></Disclosure>
+      <Disclosure label="Paychecks" hint={`${cf.income.length}`}><PaycheckPlanner cf={cf} /></Disclosure>
+      <Disclosure label="Bills" hint={`${cf.bills.filter(b=>!b.paid).length} open`}><BillPlanner cf={cf} /></Disclosure>
+      <Disclosure label="30-day forecast" hint={formatMoney(timeline[timeline.length-1]?.ending ?? totalCash)}>
+        <Timeline timeline={timeline} />
+      </Disclosure>
     </div>
+  );
+}
+
+function Disclosure({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="mx-auto max-w-2xl border-t pt-4">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between py-2 text-left"
+      >
+        <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
+        <span className="flex items-center gap-3 text-sm text-muted-foreground tabular-nums">
+          {hint}
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        </span>
+      </button>
+      {open && <div className="pt-3">{children}</div>}
+    </section>
   );
 }
 
