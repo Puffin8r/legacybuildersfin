@@ -10,7 +10,7 @@ const PHONE_NUMBER = "(951) 421-1177";
 const PHONE_HREF = "tel:+19514211177";
 
 interface BookReviewDialogProps {
-  variant?: "default" | "founder";
+  variant?: "default" | "founder" | "emerald";
 }
 
 export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
@@ -18,6 +18,7 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   const isFounder = variant === "founder";
+  const isEmerald = variant === "emerald";
 
   return (
     <div className="w-full space-y-2">
