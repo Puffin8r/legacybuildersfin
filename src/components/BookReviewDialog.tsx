@@ -9,15 +9,27 @@ const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
 const PHONE_NUMBER = "(951) 421-1177";
 const PHONE_HREF = "tel:+19514211177";
 
-export default function BookReviewDialog() {
+interface BookReviewDialogProps {
+  variant?: "default" | "founder";
+}
+
+export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
   const [open, setOpen] = useState(false);
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
+
+  const isFounder = variant === "founder";
+  const bookClass = isFounder
+    ? "w-full bg-gradient-to-r from-[#caa15a] to-[#f3dca0] text-[#1a1d24] hover:opacity-95 border-0 shadow-[0_0_24px_rgba(202,161,90,0.35)]"
+    : "w-full";
+  const callClass = isFounder
+    ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
+    : "w-full";
 
   return (
     <div className="w-full space-y-2">
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="w-full">
+        <Button size="lg" className={bookClass}>
           <CalendarCheck className="h-4 w-4 mr-2" />
           Book a Financial Review
         </Button>
@@ -56,7 +68,7 @@ export default function BookReviewDialog() {
         </div>
       </DialogContent>
     </Dialog>
-      <Button asChild size="lg" variant="outline" className="w-full">
+      <Button asChild size="lg" variant={isFounder ? "default" : "outline"} className={callClass}>
         <a
           href={PHONE_HREF}
           onClick={(e) => {

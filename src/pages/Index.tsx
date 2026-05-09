@@ -96,13 +96,24 @@ export default function Index() {
         {tab === "future" && <FutureBlueprint />}
 
         {/* Book a financial review */}
-        <section className="mt-6 rounded-2xl border bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
-          <h3 className="text-sm font-semibold mb-1">Want a hand from a real human?</h3>
-          <p className="text-xs text-muted-foreground mb-3">
-            Book a free 30-minute financial review with our team.
-          </p>
-          <BookReviewDialog />
-        </section>
+        {tab === "today" ? (
+          <section className="mt-6 rounded-2xl border border-[#caa15a]/30 bg-gradient-to-br from-[#0e1117] to-[#1a1d24] p-4 shadow-[0_10px_40px_-15px_rgba(202,161,90,0.4)]">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#caa15a]/80 mb-1">Founder · Concierge</p>
+            <h3 className="text-sm font-semibold mb-1 text-[#f5ecd4]">Want a hand from a real human?</h3>
+            <p className="text-xs text-[#caa15a]/70 mb-3">
+              Book a free 30-minute financial review with our team.
+            </p>
+            <BookReviewDialog variant="founder" />
+          </section>
+        ) : (
+          <section className="mt-6 rounded-2xl border bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+            <h3 className="text-sm font-semibold mb-1">Want a hand from a real human?</h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              Book a free 30-minute financial review with our team.
+            </p>
+            <BookReviewDialog />
+          </section>
+        )}
 
         {/* Cross-tab Coach jump prompts */}
         <section className="mt-6 rounded-2xl border bg-card p-4">
