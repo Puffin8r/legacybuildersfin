@@ -18,6 +18,7 @@ import { calcSafeToSpend } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
 import { whereInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import HideableSection from "@/components/HideableSection";
 import { fireEvent } from "@/lib/integrations";
 
 const COLORS = [
@@ -133,7 +134,7 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
 
       {/* CATEGORY BREAKDOWN */}
       {byCategory.length > 0 && (
-        <Card>
+        <HideableSection id="chart:where-categories" label="All categories chart">
           <CardHeader className="pb-2"><CardTitle className="text-base">All categories</CardTitle></CardHeader>
           <CardContent>
             <div className="h-56">
