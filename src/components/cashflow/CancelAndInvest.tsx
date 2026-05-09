@@ -15,6 +15,7 @@ import {
 } from "@/lib/subscription-service";
 import { loadAccounts as loadBankAccounts } from "@/lib/bank-service";
 import CancelDialog from "./CancelDialog";
+import HideableSection from "@/components/HideableSection";
 import { fireEvent } from "@/lib/integrations";
 
 /* ============================================================
@@ -353,6 +354,7 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
 
       {/* Summary + chart */}
       {monthlySaved > 0 && (
+        <HideableSection id="chart:cancel-invest" label="What Canceling Could Build chart">
         <Card className="border-success/30 bg-success/5">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
@@ -405,6 +407,7 @@ export default function CancelAndInvest({ cf }: { cf: CashFlow }) {
             </p>
           </CardContent>
         </Card>
+        </HideableSection>
       )}
 
       {/* Import actions */}

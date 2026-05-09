@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Building2, Webhook, Calendar, Users, Github, Upload, Sparkles, CheckCircle2, Send, PlayCircle } from "lucide-react";
+import { ArrowLeft, Building2, Webhook, Calendar, Users, Github, Upload, Sparkles, CheckCircle2, Send, PlayCircle, EyeOff, RotateCcw } from "lucide-react";
+import { useHiddenList, restoreSection, restoreAll } from "@/lib/hidden-sections";
 import IntroVideoDialog from "@/components/IntroVideoDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ export default function Settings() {
             <IntroVideoDialog />
           </CardContent>
         </Card>
+        <HiddenSectionsCard />
         <BankCard s={s} setS={setS} />
         <N8nCard s={s} setS={setS} />
         <CalendarCard s={s} setS={setS} />
@@ -56,6 +58,44 @@ export default function Settings() {
         <GithubCard />
       </main>
     </div>
+  );
+}
+
+/* ---------------- Hidden sections ---------------- */
+function HiddenSectionsCard() {
+  const hidden = useHiddenList();
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <EyeOff className="h-4 w-4" /> Hidden sections
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <p className="text-xs text-muted-foreground">
+          Insight cards and charts you've hidden from the home tabs. Restore them here.
+        </p>
+        {hidden.length === 0 ? (
+          <p className="text-sm text-muted-foreground italic">Nothing hidden right now.</p>
+        ) : (
+          <>
+            <div className="space-y-1.5">
+              {hidden.map(h => (
+                <div key={h.id} className="flex items-center justify-between gap-2 rounded-md border p-2.5">
+                  <p className="text-sm truncate flex-1">{h.label}</p>
+                  <Button size="sm" variant="outline" onClick={() => restoreSection(h.id)}>
+                    <RotateCcw className="h-3.5 w-3.5 mr-1" /> Restore
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button variant="ghost" size="sm" className="w-full" onClick={restoreAll}>
+              Restore all
+            </Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

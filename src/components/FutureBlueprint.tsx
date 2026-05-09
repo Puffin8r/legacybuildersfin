@@ -13,6 +13,7 @@ import BookReviewDialog from "@/components/BookReviewDialog";
 import RetirementIncomePlanner from "@/components/cashflow/RetirementIncomePlanner";
 import { futureInsights, fixInsights } from "@/lib/ai-insights";
 import { InsightList } from "@/components/ai/InsightCard";
+import HideableSection from "@/components/HideableSection";
 import { useCashFlow } from "@/hooks/useCashFlow";
 import { fireEvent } from "@/lib/integrations";
 import { InfoTip } from "@/components/ui/info-tip";
@@ -144,38 +145,40 @@ export default function FutureBlueprint() {
       />
 
       {/* Single projection chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Future projection</CardTitle>
-          <p className="text-xs text-muted-foreground">Growth from today until retirement.</p>
-        </CardHeader>
-        <CardContent>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={projectionData}>
-                <defs>
-                  <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.5}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="year" tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
-                  tickFormatter={y => `${deferred.currentAge + y}`} />
-                <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
-                  tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={50}/>
-                <Tooltip
-                  formatter={(v: number) => formatCurrency(v)}
-                  labelFormatter={y => `Age ${deferred.currentAge + Number(y)}`}
-                />
-                <ReferenceLine y={fin} stroke="hsl(var(--accent))" strokeDasharray="4 4"
-                  label={{ value: "FIN", position: "right", fill: "hsl(var(--accent))", fontSize: 10 }} />
-                <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="url(#fp)"
-                  strokeWidth={2} isAnimationActive={false}/>
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      <HideableSection id="chart:future-projection" label="Future projection chart">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Future projection</CardTitle>
+            <p className="text-xs text-muted-foreground">Growth from today until retirement.</p>
+          </CardHeader>
+          <CardContent>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={projectionData}>
+                  <defs>
+                    <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.5}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="year" tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
+                    tickFormatter={y => `${deferred.currentAge + y}`} />
+                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
+                    tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={50}/>
+                  <Tooltip
+                    formatter={(v: number) => formatCurrency(v)}
+                    labelFormatter={y => `Age ${deferred.currentAge + Number(y)}`}
+                  />
+                  <ReferenceLine y={fin} stroke="hsl(var(--accent))" strokeDasharray="4 4"
+                    label={{ value: "FIN", position: "right", fill: "hsl(var(--accent))", fontSize: 10 }} />
+                  <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="url(#fp)"
+                    strokeWidth={2} isAnimationActive={false}/>
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </HideableSection>
 
       {/* Retirement Income Planner */}
       <RetirementIncomePlanner />
