@@ -87,8 +87,6 @@ export default function FutureBlueprint() {
 
   return (
     <div className="space-y-4">
-      <InsightList insights={insights} />
-
       {/* Intro */}
       <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
         <CardContent className="p-4">
@@ -192,6 +190,8 @@ export default function FutureBlueprint() {
           <BookReviewDialog />
         </CardContent>
       </Card>
+
+      <InsightList insights={insights} />
     </div>
   );
 }
