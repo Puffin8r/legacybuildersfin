@@ -102,7 +102,17 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
             ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
             : isEmerald
             ? "w-full bg-white border-2 border-[#10b981]/60 hover:bg-white/90"
+            : isSpending
+            ? "w-full border-0 text-white hover:opacity-95"
             : "w-full"
+        }
+        style={
+          isSpending
+            ? {
+                background: "linear-gradient(90deg, #dc2626 0%, #000000 50%, #dc2626 100%)",
+                boxShadow: "0 0 24px rgba(220,38,38,0.4)",
+              }
+            : undefined
         }
       >
         <a
