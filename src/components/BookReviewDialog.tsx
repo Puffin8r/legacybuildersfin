@@ -3,7 +3,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ExternalLink, Phone } from "lucide-react";
+import { CalendarCheck, ExternalLink, Phone, Copy, Check } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const CALENDLY_URL = "https://calendly.com/nimbliqai/30min";
 const PHONE_NUMBER = "(951) 421-1177";
@@ -15,6 +16,19 @@ interface BookReviewDialogProps {
 
 export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
   const [open, setOpen] = useState(false);
+  const [callOpen, setCallOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(PHONE_NUMBER);
+      setCopied(true);
+      toast({ title: "Number copied", description: PHONE_NUMBER });
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      toast({ title: "Copy failed", description: PHONE_NUMBER });
+    }
+  };
   const embedUrl = `${CALENDLY_URL}?embed_domain=${window.location.hostname}&embed_type=Inline&hide_gdpr_banner=1`;
 
   const isFounder = variant === "founder";
@@ -94,9 +108,9 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
       </DialogContent>
     </Dialog>
       <Button
-        asChild
         size="lg"
         variant="outline"
+        onClick={() => setCallOpen(true)}
         className={
           isFounder
             ? "w-full bg-[#0e1117] text-[#f3dca0] border-2 border-[#caa15a]/60 hover:bg-[#1a1d24] hover:text-[#f5ecd4]"
@@ -115,44 +129,62 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
             : undefined
         }
       >
-        <a
-          href={PHONE_HREF}
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.href = PHONE_HREF;
-          }}
-        >
-          {isEmerald ? (
-            <>
-              <Phone
-                className="h-4 w-4 mr-2"
-                style={{ color: "#10b981" }}
-              />
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                  fontWeight: 600,
-                }}
-              >
-                Or call today {PHONE_NUMBER}
-              </span>
-            </>
-          ) : isSpending ? (
-            <>
-              <Phone className="h-4 w-4 mr-2 text-white" />
-              <span className="text-white font-semibold">Or call today {PHONE_NUMBER}</span>
-            </>
-          ) : (
-            <>
-              <Phone className="h-4 w-4 mr-2" />
+        {isEmerald ? (
+          <>
+            <Phone className="h-4 w-4 mr-2" style={{ color: "#10b981" }} />
+            <span
+              style={{
+                background: "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                fontWeight: 600,
+              }}
+            >
               Or call today {PHONE_NUMBER}
-            </>
-          )}
-        </a>
+            </span>
+          </>
+        ) : isSpending ? (
+          <>
+            <Phone className="h-4 w-4 mr-2 text-white" />
+            <span className="text-white font-semibold">Or call today {PHONE_NUMBER}</span>
+          </>
+        ) : (
+          <>
+            <Phone className="h-4 w-4 mr-2" />
+            Or call today {PHONE_NUMBER}
+          </>
+        )}
       </Button>
+
+      <Dialog open={callOpen} onOpenChange={setCallOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Phone className="h-5 w-5 text-primary" />
+              Call our team
+            </DialogTitle>
+            <DialogDescription>
+              Tap "Call now" to dial directly, or copy the number to use later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="text-center py-3">
+            <p className="text-2xl font-bold tracking-wide">{PHONE_NUMBER}</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button asChild size="lg" className="flex-1">
+              <a href={PHONE_HREF}>
+                <Phone className="h-4 w-4 mr-2" />
+                Call now
+              </a>
+            </Button>
+            <Button size="lg" variant="outline" className="flex-1" onClick={handleCopy}>
+              {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+              {copied ? "Copied" : "Copy number"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
