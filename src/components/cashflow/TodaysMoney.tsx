@@ -155,38 +155,6 @@ function Disclosure({ label, hint, children }: { label: string; hint?: string; c
   );
 }
 
-function Stat({ label, value, hint, positive }: { label: string; value: string; hint?: string; positive?: boolean }) {
-  return (
-    <div className="rounded-lg bg-muted/60 p-3">
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className={`text-lg font-semibold ${positive ? "text-success" : ""}`}>{value}</p>
-      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
-    </div>
-  );
-}
-
-function SafeToSpendCard({ safe }: { safe: ReturnType<typeof calcSafeToSpend> }) {
-  const tone =
-    safe.amount < 0 ? { ring: "border-destructive bg-destructive/10 text-destructive", icon: AlertTriangle, label: "Don't spend more" }
-    : safe.amount < 50 ? { ring: "border-warning bg-warning/15 text-warning", icon: AlertTriangle, label: "Be careful" }
-    : { ring: "border-success bg-success/10 text-success", icon: CheckCircle2, label: "You're good" };
-  const Icon = tone.icon;
-  return (
-    <Card className={`border-2 ${tone.ring}`}>
-      <CardContent className="p-5">
-        <div className="flex items-center gap-2 text-sm font-medium opacity-80"><Icon className="h-4 w-4"/>Safe to spend <InfoTip tip="safeToSpend" /></div>
-        <p className="text-5xl font-bold font-heading mt-1">{formatMoney(safe.amount)}</p>
-        <p className="text-sm mt-1 opacity-80">
-          Until {safe.nextPaycheckDate ? new Date(safe.nextPaycheckDate).toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" }) : "next 30 days"} · {tone.label}
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-foreground/80">
-          <div className="rounded bg-background/70 p-2"><div className="opacity-70">Cash now</div><div className="font-semibold">{formatMoney(safe.currentBalance)}</div></div>
-          <div className="rounded bg-background/70 p-2"><div className="opacity-70">Bills before payday</div><div className="font-semibold">-{formatMoney(safe.billsBeforeNextPaycheck)}</div></div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function CashCard({ cf }: { cf: CashFlow }) {
   const [name, setName] = useState("");
