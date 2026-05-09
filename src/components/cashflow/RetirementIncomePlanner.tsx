@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import { PiggyBank, Target, Sparkles, TrendingUp } from "lucide-react";
 import { formatCurrency, calcProjectionData } from "@/lib/financial-calculations";
+import HideableSection from "@/components/HideableSection";
 
 // 2025 IRS Roth IRA contribution limits
 const ROTH_LIMIT_UNDER_50 = 7000;
@@ -250,44 +251,46 @@ export default function RetirementIncomePlanner() {
       </Card>
 
       {/* Growth projection chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Retirement growth projection</CardTitle>
-          {inflationRate > 0 && (
-            <p className="text-xs text-muted-foreground">Solid = future dollars · Dashed = today's dollars (inflation-adjusted)</p>
-          )}
-        </CardHeader>
-        <CardContent>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={projection}>
-                <defs>
-                  <linearGradient id="rip" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.5}/>
-                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="year" tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
-                  tickFormatter={y => `${deferred.currentAge + Number(y)}`} />
-                <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
-                  tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={50}/>
-                <Tooltip
-                  formatter={(v: number, name) => [formatCurrency(v), name === "real" ? "Today's $" : "Future $"]}
-                  labelFormatter={y => `Age ${deferred.currentAge + Number(y)}`}
-                />
-                <ReferenceLine y={requiredPortfolio} stroke="hsl(var(--primary))" strokeDasharray="4 4"
-                  label={{ value: "Goal", position: "right", fill: "hsl(var(--primary))", fontSize: 10 }} />
-                <Area type="monotone" dataKey="value" name="Future $" stroke="hsl(var(--accent))" fill="url(#rip)"
-                  strokeWidth={2} isAnimationActive={false}/>
-                {inflationRate > 0 && (
-                  <Area type="monotone" dataKey="real" name="Today's $" stroke="hsl(var(--primary))" fill="none"
-                    strokeWidth={2} strokeDasharray="4 4" isAnimationActive={false}/>
-                )}
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      <HideableSection id="chart:retirement-growth" label="Retirement growth projection chart">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Retirement growth projection</CardTitle>
+            {inflationRate > 0 && (
+              <p className="text-xs text-muted-foreground">Solid = future dollars · Dashed = today's dollars (inflation-adjusted)</p>
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={projection}>
+                  <defs>
+                    <linearGradient id="rip" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.5}/>
+                      <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="year" tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
+                    tickFormatter={y => `${deferred.currentAge + Number(y)}`} />
+                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
+                    tickFormatter={v => `$${(v/1000).toFixed(0)}k`} width={50}/>
+                  <Tooltip
+                    formatter={(v: number, name) => [formatCurrency(v), name === "real" ? "Today's $" : "Future $"]}
+                    labelFormatter={y => `Age ${deferred.currentAge + Number(y)}`}
+                  />
+                  <ReferenceLine y={requiredPortfolio} stroke="hsl(var(--primary))" strokeDasharray="4 4"
+                    label={{ value: "Goal", position: "right", fill: "hsl(var(--primary))", fontSize: 10 }} />
+                  <Area type="monotone" dataKey="value" name="Future $" stroke="hsl(var(--accent))" fill="url(#rip)"
+                    strokeWidth={2} isAnimationActive={false}/>
+                  {inflationRate > 0 && (
+                    <Area type="monotone" dataKey="real" name="Today's $" stroke="hsl(var(--primary))" fill="none"
+                      strokeWidth={2} strokeDasharray="4 4" isAnimationActive={false}/>
+                  )}
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </HideableSection>
 
       {/* Milestones */}
       <Card>
