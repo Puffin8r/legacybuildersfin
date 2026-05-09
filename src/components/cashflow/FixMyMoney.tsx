@@ -107,7 +107,27 @@ function DebtFreedomMap({ cf }: { cf: CashFlow }) {
             <Trophy className="h-5 w-5 text-primary shrink-0 mt-0.5"/>
             <div>
               <p className="text-sm font-semibold">
-                We recommend the <span className="text-primary">{recommendation === "avalanche" ? "Avalanche" : "Snowball"}</span> method
+                <span
+                  style={{
+                    background: "linear-gradient(90deg, #6ee7b7 0%, #a7f3d0 50%, #6ee7b7 100%)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  We recommend the
+                </span>{" "}
+                <span className="text-white">{recommendation === "avalanche" ? "Avalanche" : "Snowball"}</span>{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(90deg, #6ee7b7 0%, #a7f3d0 50%, #6ee7b7 100%)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  method
+                </span>
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {recommendation === "avalanche"
