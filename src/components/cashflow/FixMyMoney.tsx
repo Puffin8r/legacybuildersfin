@@ -16,15 +16,12 @@ import {
 } from "@/lib/cashflow-types";
 import { calcSafeToSpend, billsThisMonth, spendingThisMonth, buildTimeline, firstOverdraft } from "@/lib/cashflow-engine";
 import type { CashFlow } from "@/hooks/useCashFlow";
-import { fixInsights } from "@/lib/ai-insights";
-import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 import { toast } from "sonner";
 import { InfoTip } from "@/components/ui/info-tip";
 import CancelAndInvest from "./CancelAndInvest";
 
 export default function FixMyMoney({ cf }: { cf: CashFlow }) {
-  const insights = useMemo(() => fixInsights({ debts: cf.debts, goals: cf.goals }), [cf.debts, cf.goals]);
   const [glow, setGlow] = useState(true);
   const fired = useRef(false);
   useEffect(() => {
@@ -36,7 +33,6 @@ export default function FixMyMoney({ cf }: { cf: CashFlow }) {
 
   return (
     <div className="fix-emerald-bg -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 rounded-2xl text-white space-y-4">
-      <InsightList insights={insights} />
       <Card className="fix-emerald-card">
         <CardContent className="p-4 flex items-start gap-3">
           <Sparkles className="h-6 w-6 shrink-0 mt-0.5" style={{ color: "#34d399" }}/>
