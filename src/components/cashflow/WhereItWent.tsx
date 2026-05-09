@@ -135,7 +135,8 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
       {/* CATEGORY BREAKDOWN */}
       {byCategory.length > 0 && (
         <HideableSection id="chart:where-categories" label="All categories chart">
-          <CardHeader className="pb-2"><CardTitle className="text-base">All categories</CardTitle></CardHeader>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-base">All categories</CardTitle></CardHeader>
           <CardContent>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
@@ -172,7 +173,8 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
               ))}
             </div>
           </CardContent>
-        </Card>
+          </Card>
+        </HideableSection>
       )}
 
       {/* MONEY LEAK AUDIT */}
