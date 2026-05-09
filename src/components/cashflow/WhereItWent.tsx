@@ -21,7 +21,7 @@ import { InsightList } from "@/components/ai/InsightCard";
 import { fireEvent } from "@/lib/integrations";
 
 const COLORS = [
-  "hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))",
+  "hsl(0 78% 52%)", "hsl(var(--secondary))", "hsl(var(--accent))",
   "hsl(var(--destructive))", "hsl(var(--success))", "hsl(var(--warning))",
   "hsl(220 30% 50%)", "hsl(280 50% 55%)", "hsl(15 75% 55%)",
   "hsl(160 50% 45%)", "hsl(45 80% 50%)", "hsl(220 10% 55%)",
