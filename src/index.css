@@ -108,4 +108,71 @@
     font-family: var(--font-heading);
     @apply text-xl font-semibold text-foreground;
   }
+
+  /* ===== Editorial luxury — gamified surfaces ===== */
+  .luxe-card {
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(202, 161, 90, 0.18) 0%, transparent 55%),
+      radial-gradient(100% 80% at 100% 100%, rgba(202, 161, 90, 0.10) 0%, transparent 60%),
+      linear-gradient(140deg, #0e1117 0%, #161a23 50%, #0b0d12 100%);
+    color: #ece3d2;
+    border: 1px solid rgba(202, 161, 90, 0.35);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 30px 60px -30px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .luxe-card-light {
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(202, 161, 90, 0.18) 0%, transparent 55%),
+      linear-gradient(140deg, #faf6ee 0%, #f1e8d3 100%);
+    border: 1px solid rgba(202, 161, 90, 0.45);
+    color: #1a1d24;
+  }
+  .luxe-grain {
+    position: relative;
+  }
+  .luxe-grain::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0.6;
+  }
+  .gold-text {
+    background: linear-gradient(180deg, #f3dca0 0%, #c89b50 60%, #8a6a3b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .gold-border {
+    border: 1px solid;
+    border-image: linear-gradient(135deg, #f3dca0, #8a6a3b) 1;
+  }
+  .gold-fill {
+    background: linear-gradient(135deg, #f3dca0 0%, #c89b50 50%, #8a6a3b 100%);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+  @keyframes shimmer-x {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+  .shimmer::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+    animation: shimmer-x 3.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes flame-flicker {
+    0%, 100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+    50%      { transform: scale(1.08) rotate(2deg); opacity: 0.92; }
+  }
+  .flame { animation: flame-flicker 1.6s ease-in-out infinite; transform-origin: bottom; }
 }
