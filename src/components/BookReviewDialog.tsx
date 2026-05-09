@@ -171,15 +171,26 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
           <div className="text-center py-3">
             <p className="text-2xl font-bold tracking-wide">{PHONE_NUMBER}</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button asChild size="lg" className="flex-1">
-              <a href={PHONE_HREF}>
-                <Phone className="h-4 w-4 mr-2" />
+          <div className="flex flex-col gap-3">
+            <Button asChild size="lg" className="w-full h-14 text-base font-semibold">
+              <a
+                href={PHONE_HREF}
+                onClick={() => {
+                  // Force navigation to the tel: handler so the dialer opens reliably
+                  setTimeout(() => { window.location.href = PHONE_HREF; }, 50);
+                }}
+              >
+                <Phone className="h-5 w-5 mr-2" />
                 Call now
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="flex-1" onClick={handleCopy}>
-              {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full h-14 text-base font-semibold"
+              onClick={handleCopy}
+            >
+              {copied ? <Check className="h-5 w-5 mr-2" /> : <Copy className="h-5 w-5 mr-2" />}
               {copied ? "Copied" : "Copy number"}
             </Button>
           </div>
