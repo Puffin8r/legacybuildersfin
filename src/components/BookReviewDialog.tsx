@@ -140,6 +140,11 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
                 Or call today {PHONE_NUMBER}
               </span>
             </>
+          ) : isSpending ? (
+            <>
+              <Phone className="h-4 w-4 mr-2 text-white" />
+              <span className="text-white font-semibold">Or call today {PHONE_NUMBER}</span>
+            </>
           ) : (
             <>
               <Phone className="h-4 w-4 mr-2" />
