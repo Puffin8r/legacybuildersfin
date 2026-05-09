@@ -149,6 +149,63 @@ export type Database = {
         }
         Relationships: []
       }
+      calendly_events: {
+        Row: {
+          cancel_url: string | null
+          created_at: string
+          dismissed_at: string | null
+          event_uri: string
+          id: string
+          invitee_email: string
+          invitee_name: string | null
+          invitee_uri: string
+          no_show_at: string | null
+          raw_payload: Json | null
+          reschedule_url: string | null
+          scheduled_end: string | null
+          scheduled_start: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          cancel_url?: string | null
+          created_at?: string
+          dismissed_at?: string | null
+          event_uri: string
+          id?: string
+          invitee_email: string
+          invitee_name?: string | null
+          invitee_uri: string
+          no_show_at?: string | null
+          raw_payload?: Json | null
+          reschedule_url?: string | null
+          scheduled_end?: string | null
+          scheduled_start: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          cancel_url?: string | null
+          created_at?: string
+          dismissed_at?: string | null
+          event_uri?: string
+          id?: string
+          invitee_email?: string
+          invitee_name?: string | null
+          invitee_uri?: string
+          no_show_at?: string | null
+          raw_payload?: Json | null
+          reschedule_url?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       debts: {
         Row: {
           balance: number

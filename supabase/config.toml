@@ -12,3 +12,6 @@ verify_jwt = false
 [functions.savings-goal-updated]
 verify_jwt = false
 
+[functions.calendly-webhook]
+verify_jwt = false
+

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.link_calendly_events_to_user() FROM PUBLIC, anon, authenticated;
