@@ -10,7 +10,7 @@ const PHONE_NUMBER = "(951) 421-1177";
 const PHONE_HREF = "tel:+19514211177";
 
 interface BookReviewDialogProps {
-  variant?: "default" | "founder" | "emerald";
+  variant?: "default" | "founder" | "emerald" | "spending";
 }
 
 export default function BookReviewDialog({ variant = "default" }: BookReviewDialogProps = {}) {
