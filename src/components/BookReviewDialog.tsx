@@ -19,6 +19,7 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
 
   const isFounder = variant === "founder";
   const isEmerald = variant === "emerald";
+  const isSpending = variant === "spending";
 
   return (
     <div className="w-full space-y-2">
