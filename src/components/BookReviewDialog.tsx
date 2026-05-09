@@ -26,12 +26,23 @@ export default function BookReviewDialog({ variant = "default" }: BookReviewDial
       <DialogTrigger asChild>
         <Button
           size="lg"
-          className={isFounder ? "w-full border-0 text-[#1a1d24] hover:opacity-95" : "w-full"}
+          className={
+            isFounder
+              ? "w-full border-0 text-[#1a1d24] hover:opacity-95"
+              : isEmerald
+              ? "w-full border-0 text-white hover:opacity-95"
+              : "w-full"
+          }
           style={
             isFounder
               ? {
                   background: "linear-gradient(135deg, #caa15a 0%, #f3dca0 50%, #caa15a 100%)",
                   boxShadow: "0 0 24px rgba(202,161,90,0.4)",
+                }
+              : isEmerald
+              ? {
+                  background: "linear-gradient(135deg, #10b981 0%, #34d399 50%, #059669 100%)",
+                  boxShadow: "0 0 24px rgba(16,185,129,0.45)",
                 }
               : undefined
           }
