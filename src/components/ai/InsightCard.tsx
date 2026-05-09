@@ -1,6 +1,7 @@
 import { Sparkles, AlertTriangle, ShieldAlert, CheckCircle2, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import HideableSection from "@/components/HideableSection";
 import type { MoneyInsight } from "@/lib/ai-insights";
 
 const TONE = {
@@ -39,7 +40,11 @@ export function InsightList({ insights }: { insights: MoneyInsight[] }) {
   if (!insights.length) return null;
   return (
     <div className="space-y-2">
-      {insights.map(i => <InsightCard key={i.id} insight={i} />)}
+      {insights.map(i => (
+        <HideableSection key={i.id} id={`insight:${i.id}`} label={`AI Coach: ${i.title}`}>
+          <InsightCard insight={i} />
+        </HideableSection>
+      ))}
     </div>
   );
 }
