@@ -123,7 +123,7 @@ export default function WhereItWent({ cf }: { cf: CashFlow }) {
                   <span><span className="font-semibold">{formatMoney(c.value)}</span> <span className="text-muted-foreground">· {c.pct.toFixed(0)}%</span></span>
                 </div>
                 <div className="h-2 mt-1 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${c.pct}%`, background: COLORS[i % COLORS.length] }} />
+                  <div className="h-full rounded-full" style={{ width: `${c.pct}%`, background: gradientFor(i) }} />
                 </div>
               </div>
             ))}
